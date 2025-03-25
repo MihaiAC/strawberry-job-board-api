@@ -1,0 +1,21 @@
+type Employer {
+  id: Int!
+  name: String!
+  contactEmail: String!
+  industry: String!
+  jobs: [Job!]!
+}
+
+type Job {
+  id: Int!
+  title: String!
+  description: String!
+  employerId: Int!
+  employer: Employer!
+}
+
+type Query {
+  hello(name: String!): String!
+  jobs: [Job!]!
+  employers: [Employer!]!
+}

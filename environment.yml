@@ -29,6 +29,7 @@ dependencies:
   - idna=3.7=py313h06a4308_0
   - jinja2=3.1.6=py313h06a4308_0
   - ld_impl_linux-64=2.40=h12ee557_0
+  - libcst=1.6.0=py313h95f1b2d_0
   - libffi=3.4.4=h6a678d5_1
   - libgcc-ng=11.2.0=h1234567_1
   - libgomp=11.2.0=h1234567_1
@@ -63,6 +64,7 @@ dependencies:
   - sqlite=3.45.3=h5eee18b_0
   - starlette=0.46.1=pyha770c72_0
   - strawberry-graphql=0.262.5=pyh29332c3_0
+  - strawberry-graphql-with-cli=0.262.5=h29332c3_0
   - strawberry-graphql-with-fastapi=0.262.5=h29332c3_0
   - tk=8.6.14=h39e8969_0
   - typer=0.15.2=pyhff008b6_0
