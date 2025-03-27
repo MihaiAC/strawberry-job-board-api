@@ -1,5 +1,6 @@
 name: strawberry_fast_api
 channels:
+  - anaconda
   - conda-forge
   - defaults
   - https://repo.anaconda.com/pkgs/main
@@ -15,6 +16,7 @@ dependencies:
   - cffi=1.17.1=py313h1fdaa30_1
   - click=8.1.7=py313h06a4308_0
   - cryptography=44.0.1=py313h7825ff9_0
+  - cyrus-sasl=2.1.28=h52b45da_1
   - dnspython=2.4.2=py313h06a4308_0
   - email-validator=2.2.0=pyhd8ed1ab_1
   - email_validator=2.2.0=hd8ed1ab_1
@@ -22,18 +24,23 @@ dependencies:
   - fastapi=0.115.12=pyh29332c3_0
   - fastapi-cli=0.0.7=pyhd8ed1ab_0
   - graphql-core=3.2.6=py313h06a4308_0
+  - greenlet=3.1.1=py313h6a678d5_0
   - h11=0.14.0=py313h06a4308_0
   - httpcore=1.0.2=py313h06a4308_0
   - httptools=0.6.4=py313h5eee18b_0
   - httpx=0.27.0=py313h06a4308_0
   - idna=3.7=py313h06a4308_0
   - jinja2=3.1.6=py313h06a4308_0
+  - krb5=1.20.1=h143b758_1
   - ld_impl_linux-64=2.40=h12ee557_0
   - libcst=1.6.0=py313h95f1b2d_0
+  - libedit=3.1.20230828=h5eee18b_0
   - libffi=3.4.4=h6a678d5_1
-  - libgcc-ng=11.2.0=h1234567_1
-  - libgomp=11.2.0=h1234567_1
+  - libgcc=14.2.0=h767d61c_2
+  - libgcc-ng=14.2.0=h69a702a_2
+  - libgomp=14.2.0=h767d61c_2
   - libmpdec=4.0.0=h5eee18b_0
+  - libpq=17.4=hdbd6064_0
   - libstdcxx-ng=11.2.0=h1234567_1
   - libuuid=1.41.5=h5eee18b_0
   - libuv=1.48.0=h5eee18b_0
@@ -41,9 +48,12 @@ dependencies:
   - markupsafe=3.0.2=py313h5eee18b_0
   - mdurl=0.1.0=py313h06a4308_0
   - ncurses=6.4=h6a678d5_0
+  - openldap=2.6.4=h42fbc30_0
   - openssl=3.0.16=h5eee18b_0
   - packaging=24.2=py313h06a4308_0
   - pip=25.0=py313h06a4308_0
+  - psycopg=3.2.6=pyh73ea3be_0
+  - psycopg-c=3.2.6=py313h54c3ffa_0
   - pycparser=2.21=pyhd3eb1b0_0
   - pydantic=2.10.3=py313h06a4308_0
   - pydantic-core=2.27.1=py313h4aa5aa6_0
@@ -61,6 +71,7 @@ dependencies:
   - shellingham=1.5.0=py313h06a4308_0
   - six=1.16.0=pyhd3eb1b0_1
   - sniffio=1.3.0=py313h06a4308_0
+  - sqlalchemy=2.0.37=py313h00e1ef3_0
   - sqlite=3.45.3=h5eee18b_0
   - starlette=0.46.1=pyha770c72_0
   - strawberry-graphql=0.262.5=pyh29332c3_0
