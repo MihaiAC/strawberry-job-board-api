@@ -1,8 +1,72 @@
 import strawberry
 
 from typing import List
-from fastapi import FastAPI
 from strawberry.fastapi import GraphQLRouter
+
+from fastapi import FastAPI
+from contextlib import asynccontextmanager
+
+from sqlalchemy import create_engine, String, ForeignKey
+from sqlalchemy.orm import (
+    DeclarativeBase,
+    Mapped,
+    mapped_column,
+    relationship,
+    Session,
+)
+
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+USER = os.getenv("POSTGRES_USER")
+PASSWORD = os.getenv("POSTGRES_PASSWORD")
+DATABASE = os.getenv("POSTGRES_DB")
+HOST = os.getenv("HOST")
+PORT = os.getenv("PORT")
+
+# Beginning part = "dialect".
+DATABASE_URL = f"postgresql+psycopg://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}"
+
+# Create engine.
+engine = create_engine(DATABASE_URL, echo=True)
+
+
+class Base(DeclarativeBase):
+    pass
+
+
+class EmployerObject(Base):
+    __tablename__ = "employers"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(40))
+    contact_email: Mapped[str] = mapped_column(String(254))
+    industry: Mapped[str] = mapped_column(String(254))
+    jobs: Mapped[List["JobObject"]] = relationship(
+        back_populates="employer", cascade="all, delete-orphan"
+    )
+
+    def __repr__(self) -> str:
+        return (
+            f"Employer(id={self.id!r}, name={self.name!r}, "
+            f"contact_email={self.contact_email!r}, "
+            f"industry={self.industry!r})"
+        )
+
+
+class JobObject(Base):
+    __tablename__ = "jobs"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str] = mapped_column(String(150))
+    description: Mapped[str] = mapped_column(String(1000))
+    employer_id: Mapped[int] = mapped_column(ForeignKey("employers.id"))
+    employer: Mapped["EmployerObject"] = relationship(
+        "EmployerObject",
+        back_populates="jobs",
+    )
+
 
 employers_data = [
     {
@@ -45,6 +109,17 @@ jobs_data = [
         "employer_id": 2,
     },
 ]
+
+
+# Drop tables on rerun.
+def prepare_database():
+    Base.metadata.drop_all(engine)
+    Base.metadata.create_all(engine)
+
+    with Session(engine) as session:
+        session.add_all([EmployerObject(**x) for x in employers_data])
+        session.add_all([JobObject(**x) for x in jobs_data])
+        session.commit()
 
 
 # Way to handle circular references.
@@ -94,5 +169,12 @@ schema = strawberry.Schema(Query)
 
 graphql_app = GraphQLRouter(schema)
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    prepare_database()
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 app.include_router(graphql_app, prefix="/graphql")
