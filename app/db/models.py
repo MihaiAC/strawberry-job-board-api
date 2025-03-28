@@ -46,3 +46,10 @@ class Job(Base):
         "Employer",
         back_populates="jobs",
     )
+
+    def __repr__(self) -> str:
+        return (
+            f"Job(id={self.id!r}, title={self.title!r}, "
+            f"description={self.description[:30]!r}..., "
+            f"employer_id={self.employer_id!r})"
+        )
