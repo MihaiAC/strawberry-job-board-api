@@ -18,4 +18,6 @@ type Query {
   hello(name: String!): String!
   jobs: [Job!]!
   employers: [Employer!]!
+  job(id: Int!): Job!
+  employer(id: Int!): Employer!
 }
