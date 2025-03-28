@@ -2,6 +2,7 @@ import strawberry
 from app.db.database import engine
 from .types import (
     Job as Job_gql,
+    Success as Success_gql,
 )
 from app.db.database import Job_sql
 from sqlalchemy.orm import Session
@@ -19,6 +20,7 @@ class Mutation:
             session.add(job_sql)
             session.commit()
             session.refresh(job_sql)
+
             job_gql = Job_gql(
                 id=job_sql.id,
                 title=title,

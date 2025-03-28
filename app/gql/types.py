@@ -19,3 +19,9 @@ class Job:
     description: str
     employer_id: int
     employer: Employer
+
+
+@strawberry.type
+class Success:
+    success: bool
+    message: str
