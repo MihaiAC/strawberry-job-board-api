@@ -30,6 +30,7 @@ dependencies:
   - httptools=0.6.4=py313h5eee18b_0
   - httpx=0.27.0=py313h06a4308_0
   - idna=3.7=py313h06a4308_0
+  - iniconfig=1.1.1=pyhd3eb1b0_0
   - jinja2=3.1.6=py313h06a4308_0
   - krb5=1.20.1=h143b758_1
   - ld_impl_linux-64=2.40=h12ee557_0
@@ -47,17 +48,23 @@ dependencies:
   - markdown-it-py=2.2.0=py313h06a4308_1
   - markupsafe=3.0.2=py313h5eee18b_0
   - mdurl=0.1.0=py313h06a4308_0
+  - mirakuru=2.6.0=pyhd8ed1ab_0
   - ncurses=6.4=h6a678d5_0
   - openldap=2.6.4=h42fbc30_0
   - openssl=3.0.16=h5eee18b_0
   - packaging=24.2=py313h06a4308_0
   - pip=25.0=py313h06a4308_0
+  - pluggy=1.5.0=py313h06a4308_0
+  - port-for=0.7.4=pyhd8ed1ab_1
+  - psutil=5.9.0=py313h5eee18b_1
   - psycopg=3.2.6=pyh73ea3be_0
   - psycopg-c=3.2.6=py313h54c3ffa_0
   - pycparser=2.21=pyhd3eb1b0_0
   - pydantic=2.10.3=py313h06a4308_0
   - pydantic-core=2.27.1=py313h4aa5aa6_0
   - pygments=2.15.1=py313h06a4308_1
+  - pytest=8.3.4=py313h06a4308_0
+  - pytest-postgresql=7.0.1=pyh0706c54_0
   - python=3.13.2=hf623796_100_cp313
   - python-dateutil=2.9.0post0=py313h06a4308_2
   - python-dotenv=1.1.0=pyh29332c3_1
