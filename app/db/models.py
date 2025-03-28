@@ -20,7 +20,7 @@ class Base(DeclarativeBase):
 class Employer(Base):
     __tablename__ = "employers"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(40))
     contact_email: Mapped[str] = mapped_column(String(254))
     industry: Mapped[str] = mapped_column(String(254))
@@ -38,7 +38,7 @@ class Employer(Base):
 
 class Job(Base):
     __tablename__ = "jobs"
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     title: Mapped[str] = mapped_column(String(150))
     description: Mapped[str] = mapped_column(String(1000))
     employer_id: Mapped[int] = mapped_column(ForeignKey("employers.id"))

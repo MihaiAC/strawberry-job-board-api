@@ -5,12 +5,13 @@ from fastapi import FastAPI, Depends
 from contextlib import asynccontextmanager
 
 from .gql.queries import Query
+from .gql.mutations import Mutation
 from .db.database import prepare_database, engine
 from .db.models import Employer as Employer_sql, Job as Job_sql
 from sqlalchemy.orm import Session
 
 
-schema = Schema(Query)
+schema = Schema(query=Query, mutation=Mutation)
 graphql_app = GraphQLRouter(schema)
 
 
