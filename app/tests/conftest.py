@@ -101,3 +101,8 @@ def jobs_endpoint():
 @pytest.fixture(scope="function")
 def employers_endpoint():
     return "/employers"
+
+
+@pytest.fixture(scope="function")
+def graphql_endpoint():
+    return "/graphql"
