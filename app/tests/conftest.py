@@ -5,6 +5,10 @@ from sqlalchemy.pool import StaticPool
 from sqlalchemy.exc import OperationalError as SQLAlchemyOperationalError
 from app.db.data import EMPLOYERS_DATA, JOBS_DATA
 from app.db.models import Base, Employer as Employer_sql, Job as Job_sql
+from app.db.database import get_session
+from app.main import app
+from contextlib import asynccontextmanager
+from fastapi.testclient import TestClient
 
 
 # Assumption: Docker container containing test db has to be running
@@ -66,3 +70,34 @@ def db_session(db_url):
     session.close()
     transaction.rollback()
     connection.close()
+
+
+# Dummy lifespan, since I don't want to get DB up / tear it down here.
+@asynccontextmanager
+async def dummy_lifespan(app):
+    yield
+
+
+@pytest.fixture(scope="function")
+def test_client(db_session):
+    def override_get_session():
+        try:
+            yield db_session
+        finally:
+            db_session.close()
+
+    app.dependency_overrides[get_session] = override_get_session
+    app.router.lifespan_context = dummy_lifespan
+
+    with TestClient(app) as test_client:
+        yield test_client
+
+
+@pytest.fixture(scope="function")
+def jobs_endpoint():
+    return "/jobs"
+
+
+@pytest.fixture(scope="function")
+def employers_endpoint():
+    return "/employers"

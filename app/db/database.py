@@ -12,6 +12,11 @@ from app.db.data import EMPLOYERS_DATA, JOBS_DATA
 engine = create_engine(DATABASE_URL, echo=True)
 
 
+def get_session():
+    with Session(engine) as session:
+        yield session
+
+
 # Drop tables on rerun.
 def prepare_database():
     Base.metadata.drop_all(engine)
