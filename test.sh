@@ -1,0 +1,1 @@
+pytest --dburl="postgresql+psycopg://test_user:test_pass@localhost:5433/test_db"

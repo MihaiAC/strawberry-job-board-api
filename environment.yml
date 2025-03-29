@@ -48,15 +48,12 @@ dependencies:
   - markdown-it-py=2.2.0=py313h06a4308_1
   - markupsafe=3.0.2=py313h5eee18b_0
   - mdurl=0.1.0=py313h06a4308_0
-  - mirakuru=2.6.0=pyhd8ed1ab_0
   - ncurses=6.4=h6a678d5_0
   - openldap=2.6.4=h42fbc30_0
   - openssl=3.0.16=h5eee18b_0
   - packaging=24.2=py313h06a4308_0
   - pip=25.0=py313h06a4308_0
   - pluggy=1.5.0=py313h06a4308_0
-  - port-for=0.7.4=pyhd8ed1ab_1
-  - psutil=5.9.0=py313h5eee18b_1
   - psycopg=3.2.6=pyh73ea3be_0
   - psycopg-c=3.2.6=py313h54c3ffa_0
   - pycparser=2.21=pyhd3eb1b0_0
@@ -64,7 +61,7 @@ dependencies:
   - pydantic-core=2.27.1=py313h4aa5aa6_0
   - pygments=2.15.1=py313h06a4308_1
   - pytest=8.3.4=py313h06a4308_0
-  - pytest-postgresql=7.0.1=pyh0706c54_0
+  - pytest-env=1.1.5=pyhd8ed1ab_1
   - python=3.13.2=hf623796_100_cp313
   - python-dateutil=2.9.0post0=py313h06a4308_2
   - python-dotenv=1.1.0=pyh29332c3_1
@@ -85,6 +82,7 @@ dependencies:
   - strawberry-graphql-with-cli=0.262.5=h29332c3_0
   - strawberry-graphql-with-fastapi=0.262.5=h29332c3_0
   - tk=8.6.14=h39e8969_0
+  - tomli=2.0.1=py313h06a4308_1
   - typer=0.15.2=pyhff008b6_0
   - typer-slim=0.15.2=pyh29332c3_0
   - typer-slim-standard=0.15.2=h801b22e_0
