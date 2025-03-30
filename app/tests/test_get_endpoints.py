@@ -3,7 +3,7 @@ from app.db.data import JOBS_DATA, EMPLOYERS_DATA
 
 
 @pytest.mark.api
-@pytest.mark.integration
+@pytest.mark.sql
 def test_get_jobs(test_client, jobs_endpoint):
     response = test_client.get(jobs_endpoint)
     assert response.status_code == 200
@@ -15,7 +15,7 @@ def test_get_jobs(test_client, jobs_endpoint):
 
 
 @pytest.mark.api
-@pytest.mark.integration
+@pytest.mark.sql
 def test_get_employers(test_client, employers_endpoint):
     response = test_client.get(employers_endpoint)
     assert response.status_code == 200

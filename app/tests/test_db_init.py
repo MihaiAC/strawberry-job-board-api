@@ -4,8 +4,10 @@ from app.db.models import (
     Employer as Employer_sql,
 )
 from app.db.data import JOBS_DATA, EMPLOYERS_DATA
+import pytest
 
 
+@pytest.mark.ops
 def test_jobs_query(db_session):
     # Query jobs with their employers
     jobs = db_session.query(Job_sql).options(joinedload(Job_sql.employer)).all()
