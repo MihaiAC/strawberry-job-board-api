@@ -53,7 +53,7 @@ class Query:
         with Session(engine) as session:
             employer = (
                 session.query(Employer_sql)
-                .options(joinedload(Employer_gql.jobs))
+                .options(joinedload(Employer_sql.jobs))
                 .filter_by(id=id)
                 .first()
             )
