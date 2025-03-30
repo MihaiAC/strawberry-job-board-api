@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from sqlalchemy.orm import (
     DeclarativeBase,
     mapped_column,
@@ -9,6 +11,7 @@ from sqlalchemy import (
     String,
     ForeignKey,
 )
+
 
 from typing import List
 
