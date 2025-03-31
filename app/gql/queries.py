@@ -1,6 +1,6 @@
 import strawberry
 from strawberry.types import Info
-from typing import List
+from typing import List, Optional
 from .types import (
     Job as Job_gql,
     Employer as Employer_gql,
@@ -34,7 +34,7 @@ class Query:
         return [to_employer_gql(employer, deep=True) for employer in employers]
 
     @strawberry.field
-    def job(self, id: int, info: Info) -> Job_gql:
+    def job(self, id: int, info: Info) -> Optional[Job_gql]:
         db_session = info.context["db_session"]
         job = (
             db_session.query(Job_sql)
@@ -45,7 +45,7 @@ class Query:
         return to_job_gql(job, deep=True) if job else None
 
     @strawberry.field
-    def employer(self, id: int, info: Info) -> Employer_gql:
+    def employer(self, id: int, info: Info) -> Optional[Employer_gql]:
         db_session = info.context["db_session"]
         employer = (
             db_session.query(Employer_sql)
