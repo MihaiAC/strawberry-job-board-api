@@ -155,7 +155,7 @@ def test_delete_existing_job(test_client, graphql_endpoint):
     assert response.status_code == 200
 
     result = response.json()
-    assert result["data"]["deleteJob"] == True
+    assert result["data"]["deleteJob"]
 
     # Check that the job has actually been deleted.
     query = """
