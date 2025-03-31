@@ -56,3 +56,13 @@ class Job(Base):
             f"description={self.description[:30]!r}..., "
             f"employer_id={self.employer_id!r})"
         )
+
+
+class User(Base):
+    __tablename__ = "users"
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    username: Mapped[str] = mapped_column(String(30))
+    email: Mapped[str] = mapped_column(String(254))
+    # Plaintext for now.
+    password: Mapped[str] = mapped_column(String(30))
+    role: Mapped[str] = mapped_column(String[20])

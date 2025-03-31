@@ -22,6 +22,14 @@ class Job:
 
 
 @strawberry.type
+class User:
+    id: int
+    username: str
+    email: str
+    role: str
+
+
+@strawberry.type
 class Success:
     success: bool
     message: str

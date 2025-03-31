@@ -33,3 +33,24 @@ JOBS_DATA = [
         "employer_id": 2,
     },
 ]
+
+USERS_DATA = [
+    {
+        "username": "thomas",
+        "email": "tomthomas@example.com",
+        "password": "a123",
+        "role": "admin",
+    },
+    {
+        "username": "janice",
+        "email": "janjanice@example.com",
+        "password": "b234",
+        "role": "user",
+    },
+    {
+        "username": "xangor",
+        "email": "xangorgor@example.com",
+        "password": "c345",
+        "role": "user",
+    },
+]
