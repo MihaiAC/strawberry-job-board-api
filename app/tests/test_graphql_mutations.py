@@ -30,14 +30,39 @@ def test_add_job(test_client, graphql_endpoint):
 
     assert job["employer"]["name"] == EMPLOYERS_DATA[0]["name"]
 
-    # Check that job was successfully added to the DB.
-    job_id = int(job["id"])
+
+@pytest.mark.api
+@pytest.mark.mutation
+def test_successfully_update_existing_job_title(test_client, graphql_endpoint):
+    updated_title = "Improved job title"
     query = f"""
-    query {{
-        job(id: {job_id}) {{
+    mutation {{
+        updateJob(jobId: 1, title: "{updated_title}") {{
             id
             title
-            description
+        }}
+    }}
+    """
+
+    response = test_client.post(graphql_endpoint, json={"query": query})
+    assert response is not None
+    assert response.status_code == 200
+
+    result = response.json()
+    job = result["data"]["updateJob"]
+    assert job["id"] == 1
+    assert job["title"] == updated_title
+
+
+@pytest.mark.api
+@pytest.mark.mutation
+def test_successfully_update_existing_job_employer(test_client, graphql_endpoint):
+    updated_employer_id = 2
+    query = f"""
+    mutation {{
+        updateJob(jobId: 1, employerId: {updated_employer_id}) {{
+            id
+            title
             employer {{
                 id
             }}
@@ -49,9 +74,53 @@ def test_add_job(test_client, graphql_endpoint):
     assert response.status_code == 200
 
     result = response.json()
-    job = result["data"]["job"]
-    assert job["id"] == job_id
-    assert job["title"] == "X title"
-    assert job["description"] == "X descr"
+    job = result["data"]["updateJob"]
+    assert job["id"] == 1
+    assert job["employer"]["id"] == updated_employer_id
 
-    assert job["employer"]["id"] == 1
+
+@pytest.mark.api
+@pytest.mark.mutation
+def test_update_nonexisting_job(test_client, graphql_endpoint):
+    updated_title = "Improved job title"
+    query = f"""
+    mutation {{
+        updateJob(jobId: 14, title: "{updated_title}") {{
+            id
+            title
+        }}
+    }}
+    """
+
+    response = test_client.post(graphql_endpoint, json={"query": query})
+    assert response is not None
+    assert response.status_code == 200
+
+    result = response.json()
+    assert result["data"] is None
+    assert "errors" in result
+    assert "not found" in result["errors"][0]["message"]
+
+
+@pytest.mark.api
+@pytest.mark.mutation
+def test_update_existing_job_insufficient_args(test_client, graphql_endpoint):
+    query = """
+    mutation {
+        updateJob(jobId: 1) {
+            id
+            title
+        }
+    }
+    """
+    response = test_client.post(graphql_endpoint, json={"query": query})
+    assert response is not None
+    assert response.status_code == 200
+
+    result = response.json()
+    assert result["data"] is None
+    assert "errors" in result
+    assert (
+        "Please provide at least one job field you would like to modify."
+        == result["errors"][0]["message"]
+    )
