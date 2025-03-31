@@ -4,8 +4,7 @@ from strawberry.fastapi import GraphQLRouter
 from fastapi import FastAPI, Depends, Request
 from contextlib import asynccontextmanager
 
-from .gql.queries import Query
-from .gql.mutations import Mutation
+from .gql import Mutation, Query
 from .db.database import prepare_database, get_session
 from .db.models import Employer as Employer_sql, Job as Job_sql
 from sqlalchemy.orm import Session
