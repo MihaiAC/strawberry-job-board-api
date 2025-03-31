@@ -78,6 +78,22 @@ def test_successfully_update_existing_job_employer(test_client, graphql_endpoint
     assert job["id"] == 1
     assert job["employer"]["id"] == updated_employer_id
 
+    query = f"""
+    query {{
+        employer(id: {updated_employer_id}) {{
+            jobs {{
+                id
+            }}
+        }}
+    }}
+    """
+    response = test_client.post(graphql_endpoint, json={"query": query})
+    assert response is not None
+    assert response.status_code == 200
+    result = response.json()
+    jobs = result["data"]["employer"]["jobs"]
+    assert 1 in [job["id"] for job in jobs]
+
 
 @pytest.mark.api
 @pytest.mark.mutation
