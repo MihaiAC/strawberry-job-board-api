@@ -66,3 +66,21 @@ class Mutation:
         db_session.commit()
         db_session.refresh(job_sql)
         return to_job_gql(job_sql, deep=True)
+
+    @strawberry.mutation
+    def delete_job(
+        self,
+        job_id: int,
+        info: Info,
+    ) -> bool:
+
+        db_session = info.context["db_session"]
+        job_sql = db_session.query(Job_sql).filter(Job_sql.id == job_id).first()
+
+        if not job_sql:
+            raise Exception("Job not found")
+
+        db_session.delete(job_sql)
+        db_session.commit()
+
+        return True
