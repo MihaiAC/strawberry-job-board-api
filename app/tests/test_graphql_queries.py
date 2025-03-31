@@ -204,5 +204,5 @@ def test_circular_reference_depth_limit(test_client, graphql_endpoint):
     assert response.status_code == 200
 
     result = response.json()
-    assert result["data"] is None
+    assert result["data"]["job"] is None
     assert len(result["errors"]) >= 1
