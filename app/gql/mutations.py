@@ -24,11 +24,7 @@ class Mutation:
         db_session.commit()
         db_session.refresh(job_sql)
 
-        job_gql = Job_gql(
-            id=job_sql.id,
-            title=title,
-            description=description,
-            employer_id=employer_id,
-            employer=to_employer_gql(job_sql.employer, deep=False),
-        )
+        job_gql = to_job_gql(job_sql, deep=True)
         return job_gql
+
+    # def update_job
