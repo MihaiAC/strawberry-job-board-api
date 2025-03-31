@@ -1,5 +1,5 @@
 import pytest
-from app.db.data import JOBS_DATA, EMPLOYERS_DATA
+from app.db.data import JOBS_DATA, EMPLOYERS_DATA, USERS_DATA
 
 
 @pytest.mark.api
@@ -206,3 +206,30 @@ def test_circular_reference_depth_limit(test_client, graphql_endpoint):
     result = response.json()
     assert result["data"]["job"] is None
     assert len(result["errors"]) >= 1
+
+
+@pytest.mark.api
+@pytest.mark.query
+def test_get_all_users(test_client, graphql_endpoint):
+    query = """
+    query {
+        users {
+            id
+            email
+            username
+            role
+        }
+    }
+    """
+    response = test_client.post(graphql_endpoint, json={"query": query})
+    assert response is not None
+    assert response.status_code == 200
+
+    result = response.json()
+    users = result["data"]["users"]
+    assert len(users) == len(USERS_DATA)
+    assert sorted([user["username"] for user in users]) == sorted(
+        user["username"] for user in USERS_DATA
+    )
+    for user in users:
+        assert "password" not in user

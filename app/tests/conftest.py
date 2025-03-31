@@ -3,8 +3,13 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 from sqlalchemy.exc import OperationalError as SQLAlchemyOperationalError
-from app.db.data import EMPLOYERS_DATA, JOBS_DATA
-from app.db.models import Base, Employer as Employer_sql, Job as Job_sql
+from app.db.data import EMPLOYERS_DATA, JOBS_DATA, USERS_DATA
+from app.db.models import (
+    Base,
+    Employer as Employer_sql,
+    Job as Job_sql,
+    User as User_sql,
+)
 from app.db.database import get_session
 from app.main import app
 from contextlib import asynccontextmanager
@@ -62,6 +67,8 @@ def db_session(db_url):
     session.add_all([Employer_sql(**x) for x in EMPLOYERS_DATA])
     session.flush()
     session.add_all([Job_sql(**x) for x in JOBS_DATA])
+    session.flush()
+    session.add_all([User_sql(**x) for x in USERS_DATA])
     session.flush()
 
     yield session
