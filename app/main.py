@@ -1,7 +1,7 @@
 from strawberry import Schema
 from strawberry.fastapi import GraphQLRouter
 
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Request
 from contextlib import asynccontextmanager
 
 from .gql.queries import Query
@@ -11,15 +11,18 @@ from .db.models import Employer as Employer_sql, Job as Job_sql
 from sqlalchemy.orm import Session
 
 
-schema = Schema(query=Query, mutation=Mutation)
-graphql_app = GraphQLRouter(schema)
-
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     prepare_database()
     yield
 
+
+async def get_context(request: Request, db_session: Session = Depends(get_session)):
+    return {"db_session": db_session}
+
+
+schema = Schema(query=Query, mutation=Mutation)
+graphql_app = GraphQLRouter(schema, context_getter=get_context)
 
 app = FastAPI(lifespan=lifespan)
 app.include_router(graphql_app, prefix="/graphql")
