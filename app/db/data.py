@@ -54,3 +54,10 @@ USERS_DATA = [
         "role": "user",
     },
 ]
+
+APPLICATIONS_DATA = [
+    {"user_id": 2, "job_id": 1},
+    {"user_id": 2, "job_id": 3},
+    {"user_id": 3, "job_id": 2},
+    {"user_id": 3, "job_id": 4},
+]

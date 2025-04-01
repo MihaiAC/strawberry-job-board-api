@@ -1,5 +1,5 @@
 import pytest
-from app.db.data import JOBS_DATA, EMPLOYERS_DATA, USERS_DATA
+from app.db.data import JOBS_DATA, EMPLOYERS_DATA, USERS_DATA, APPLICATIONS_DATA
 
 
 @pytest.mark.api
@@ -233,3 +233,34 @@ def test_get_all_users(test_client, graphql_endpoint):
     )
     for user in users:
         assert "password" not in user
+
+
+@pytest.mark.api
+@pytest.mark.query
+def test_get_all_applications(test_client, graphql_endpoint):
+    #     job {
+    #     id
+    # }
+    # user {
+    #     id
+    # }
+    query = """
+    query {
+        applications {
+            jobId
+            userId
+        }
+    }
+    """
+    response = test_client.post(graphql_endpoint, json={"query": query})
+    assert response is not None
+    assert response.status_code == 200
+
+    result = response.json()
+    applications = result["data"]["applications"]
+    assert len(applications) == len(APPLICATIONS_DATA)
+
+    # Testing correct relationship retrieval.
+    # for application in applications:
+    #     assert application["jobId"] == application["job"]["id"]
+    #     assert application["userId"] == application["user"]["id"]

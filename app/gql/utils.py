@@ -18,6 +18,7 @@ def to_job_gql(job: Job_sql, deep: bool = False) -> Job_gql:
         employer=(
             to_employer_gql(job.employer, deep=deep) if deep and job.employer else None
         ),
+        applications=[],
     )
 
 

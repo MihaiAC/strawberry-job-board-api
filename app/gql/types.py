@@ -19,6 +19,7 @@ class Job:
     description: str
     employer_id: int
     employer: Employer
+    applications: List["Application"]
 
 
 @strawberry.type
@@ -27,6 +28,16 @@ class User:
     username: str
     email: str
     role: str
+    applications: List["Application"]
+
+
+@strawberry.type
+class Application:
+    id: int
+    user_id: int
+    job_id: int
+    user: User
+    job: Job
 
 
 @strawberry.type
