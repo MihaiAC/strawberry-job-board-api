@@ -21,6 +21,9 @@ Every entity has two classes which are tightly coupled  - the sql version used b
 
 This creates a lot of extra headaches (e.g: circular reference errors) and extra clutter. Since they are tightly coupled anyway, I imported the gql types in db.models; in all the other files that required the gql types I imported them from db.models (since I would also import the sqla types anyway in most cases).
 
+#### Queries at the same level
+You get a separate info object for each query.
+
 ### SQLAlchemy
 
 #### FK Deletions

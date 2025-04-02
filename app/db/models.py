@@ -138,7 +138,6 @@ class Employer(Base):
         )
 
 
-# TODO: How are queries at the same level handled by strawberry?
 class Job(Base):
     __tablename__ = "jobs"
     title: Mapped[str] = mapped_column(String(150))
