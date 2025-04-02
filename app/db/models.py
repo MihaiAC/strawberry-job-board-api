@@ -138,7 +138,6 @@ class Employer(Base):
         )
 
 
-# TODO: Check cascade delete when employer is deleted.
 # TODO: How are queries at the same level handled by strawberry?
 class Job(Base):
     __tablename__ = "jobs"

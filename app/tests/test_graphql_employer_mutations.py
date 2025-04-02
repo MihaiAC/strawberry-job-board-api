@@ -102,12 +102,38 @@ def test_delete_existing_employer(test_client, graphql_endpoint):
         }
     }
     """
-    response = test_client.post(graphql_endpoint, json={"query": query})
-    assert response is not None
-    assert response.status_code == 200
-
-    result = response.json()
+    result = post_graphql(test_client, graphql_endpoint, query)
     assert result["data"]["employer"] is None
+
+    # Test cascade deletes.
+    query = """
+    query {
+        jobs {
+            id
+            employerId
+        }
+    }
+    """
+    result = post_graphql(test_client, graphql_endpoint, query)
+    remaining_job_ids = []
+    jobs = result["data"]["jobs"]
+    for job in jobs:
+        assert job["employerId"] != 1
+        remaining_job_ids.append(job["id"])
+
+    query = """
+    query {
+        applications {
+            id
+            jobId
+            userId
+        }
+    }
+    """
+    result = post_graphql(test_client, graphql_endpoint, query)
+    applications = result["data"]["applications"]
+    for application in applications:
+        assert application["jobId"] in remaining_job_ids
 
 
 @pytest.mark.api
