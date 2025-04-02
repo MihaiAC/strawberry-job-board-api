@@ -12,22 +12,33 @@ def test_add_job(test_client, graphql_endpoint):
             title
             description
             employerId
-            employer {
-                name
-            }
         }
     }
     """
     response = test_client.post(graphql_endpoint, json={"query": query})
     assert response is not None
     assert response.status_code == 200
-
     result = response.json()
+
     job = result["data"]["addJob"]
     assert job["id"] == len(JOBS_DATA) + 1
     assert job["title"] == "X title"
     assert job["description"] == "X descr"
 
+    query = f"""
+    query {{
+        job(id: {len(JOBS_DATA)+1}) {{
+            employer {{
+                name
+            }}
+        }}
+    }}
+    """
+    response = test_client.post(graphql_endpoint, json={"query": query})
+    assert response is not None
+    assert response.status_code == 200
+    result = response.json()
+    job = result["data"]["job"]
     assert job["employer"]["name"] == EMPLOYERS_DATA[0]["name"]
 
 
@@ -63,9 +74,6 @@ def test_successfully_update_existing_job_employer(test_client, graphql_endpoint
         updateJob(jobId: 1, employerId: {updated_employer_id}) {{
             id
             title
-            employer {{
-                id
-            }}
         }}
     }}
     """
@@ -76,6 +84,23 @@ def test_successfully_update_existing_job_employer(test_client, graphql_endpoint
     result = response.json()
     job = result["data"]["updateJob"]
     assert job["id"] == 1
+
+    # Test that SQLA relationship has been successfully updated.
+    query = """
+    query {
+        job(id: 1) {
+            employer {
+                id
+            }
+        }
+    }
+    """
+    response = test_client.post(graphql_endpoint, json={"query": query})
+    assert response is not None
+    assert response.status_code == 200
+
+    result = response.json()
+    job = result["data"]["job"]
     assert job["employer"]["id"] == updated_employer_id
 
     query = f"""

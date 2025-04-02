@@ -150,9 +150,6 @@ def test_add_jobs_to_new_employer(test_client, graphql_endpoint):
             name
             industry
             contactEmail
-            jobs {{
-                id
-            }}
         }}
     }}
     """
@@ -162,7 +159,6 @@ def test_add_jobs_to_new_employer(test_client, graphql_endpoint):
 
     result = response.json()
     employer = result["data"]["addEmployer"]
-    assert len(employer["jobs"]) == 0
     assert employer["id"] == new_employer_id
 
     # Add a new job to the new employer.
@@ -186,9 +182,6 @@ def test_add_jobs_to_new_employer(test_client, graphql_endpoint):
     mutation {{
         updateJob(jobId: 1, employerId: {new_employer_id}) {{
             id
-            employer {{
-                id
-            }}
         }}
     }}
     """
@@ -199,7 +192,6 @@ def test_add_jobs_to_new_employer(test_client, graphql_endpoint):
     result = response.json()
     job = result["data"]["updateJob"]
     assert job["id"] == 1
-    assert job["employer"]["id"] == new_employer_id
 
     # Retrieve the jobs of the new employer.
     query = f"""

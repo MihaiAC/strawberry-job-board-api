@@ -1,7 +1,6 @@
 import strawberry
 from strawberry.types import Info
 from app.db.models import Job_gql, Job as Job_sql
-from app.gql.utils import to_job_gql
 from typing import Optional
 
 
@@ -22,8 +21,7 @@ class JobMutation:
         db_session.commit()
         db_session.refresh(job_sql)
 
-        job_gql = to_job_gql(job_sql, deep=True)
-        return job_gql
+        return job_sql.to_gql()
 
     @strawberry.mutation
     def update_job(
@@ -62,7 +60,7 @@ class JobMutation:
 
         db_session.commit()
         db_session.refresh(job_sql)
-        return to_job_gql(job_sql, deep=True)
+        return job_sql.to_gql()
 
     @strawberry.mutation
     def delete_job(
