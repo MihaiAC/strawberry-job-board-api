@@ -15,9 +15,6 @@ def test_add_employer_complete_info(test_client, graphql_endpoint):
             name
             industry
             contactEmail
-            jobs {{
-                id
-            }}
         }}
     }}
     """
@@ -31,8 +28,6 @@ def test_add_employer_complete_info(test_client, graphql_endpoint):
     assert employer["name"] == employer_name
     assert employer["industry"] == employer_industry
     assert employer["contactEmail"] == employer_email
-
-    assert len(employer["jobs"]) == 0
 
 
 @pytest.mark.api

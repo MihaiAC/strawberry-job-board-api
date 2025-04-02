@@ -1,7 +1,6 @@
 import strawberry
 from strawberry.types import Info
 from app.db.models import Employer as Employer_sql, Employer_gql
-from app.gql.utils import to_employer_gql
 from typing import Optional
 
 
@@ -24,8 +23,7 @@ class EmployerMutation:
         db_session.commit()
         db_session.refresh(employer_sql)
 
-        employer_gql = to_employer_gql(employer_sql, deep=True)
-        return employer_gql
+        return employer_sql.to_gql()
 
     @strawberry.mutation
     def update_employer(
@@ -68,7 +66,7 @@ class EmployerMutation:
 
         db_session.commit()
         db_session.refresh(employer_sql)
-        return to_employer_gql(employer_sql, deep=True)
+        return employer_sql.to_gql()
 
     @strawberry.mutation
     def delete_employer(
