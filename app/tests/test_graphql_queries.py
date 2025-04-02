@@ -1,6 +1,7 @@
 import pytest
 from app.db.data import JOBS_DATA, EMPLOYERS_DATA, USERS_DATA, APPLICATIONS_DATA
 from .test_utils import post_graphql
+from collections import defaultdict
 
 
 @pytest.mark.api
@@ -171,17 +172,19 @@ def test_get_all_users(test_client, graphql_endpoint):
 @pytest.mark.api
 @pytest.mark.query
 def test_get_all_applications(test_client, graphql_endpoint):
-    #     job {
-    #     id
-    # }
-    # user {
-    #     id
-    # }
     query = """
     query {
         applications {
             jobId
+            job {
+                id
+                title
+            }
             userId
+            user {
+                id
+                username
+            }
         }
     }
     """
@@ -190,6 +193,23 @@ def test_get_all_applications(test_client, graphql_endpoint):
     assert len(applications) == len(APPLICATIONS_DATA)
 
     # Testing correct relationship retrieval.
-    # for application in applications:
-    #     assert application["jobId"] == application["job"]["id"]
-    #     assert application["userId"] == application["user"]["id"]
+    for application in applications:
+        assert application["jobId"] == application["job"]["id"]
+        assert application["userId"] == application["user"]["id"]
+
+    user_id_to_username = defaultdict(str)
+    for idx, user in enumerate(USERS_DATA):
+        user_id_to_username[idx + 1] = user["username"]
+
+    job_id_to_title = defaultdict(str)
+    for idx, job in enumerate(JOBS_DATA):
+        job_id_to_title[idx + 1] = job["title"]
+
+    for idx in range(len(applications)):
+        job_title = applications[idx]["job"]["title"]
+        job_id = applications[idx]["jobId"]
+        assert job_title == job_id_to_title[job_id]
+
+        username = applications[idx]["user"]["username"]
+        user_id = applications[idx]["userId"]
+        assert username == user_id_to_username[user_id]
