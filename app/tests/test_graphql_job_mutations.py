@@ -1,5 +1,6 @@
 import pytest
 from app.db.data import EMPLOYERS_DATA, JOBS_DATA
+from .test_utils import post_graphql
 
 
 @pytest.mark.api
@@ -15,10 +16,7 @@ def test_add_job(test_client, graphql_endpoint):
         }
     }
     """
-    response = test_client.post(graphql_endpoint, json={"query": query})
-    assert response is not None
-    assert response.status_code == 200
-    result = response.json()
+    result = post_graphql(test_client, graphql_endpoint, query)
 
     job = result["data"]["addJob"]
     assert job["id"] == len(JOBS_DATA) + 1
@@ -34,10 +32,7 @@ def test_add_job(test_client, graphql_endpoint):
         }}
     }}
     """
-    response = test_client.post(graphql_endpoint, json={"query": query})
-    assert response is not None
-    assert response.status_code == 200
-    result = response.json()
+    result = post_graphql(test_client, graphql_endpoint, query)
     job = result["data"]["job"]
     assert job["employer"]["name"] == EMPLOYERS_DATA[0]["name"]
 
@@ -54,12 +49,7 @@ def test_successfully_update_existing_job_title(test_client, graphql_endpoint):
         }}
     }}
     """
-
-    response = test_client.post(graphql_endpoint, json={"query": query})
-    assert response is not None
-    assert response.status_code == 200
-
-    result = response.json()
+    result = post_graphql(test_client, graphql_endpoint, query)
     job = result["data"]["updateJob"]
     assert job["id"] == 1
     assert job["title"] == updated_title
@@ -77,11 +67,7 @@ def test_successfully_update_existing_job_employer(test_client, graphql_endpoint
         }}
     }}
     """
-    response = test_client.post(graphql_endpoint, json={"query": query})
-    assert response is not None
-    assert response.status_code == 200
-
-    result = response.json()
+    result = post_graphql(test_client, graphql_endpoint, query)
     job = result["data"]["updateJob"]
     assert job["id"] == 1
 
@@ -95,11 +81,7 @@ def test_successfully_update_existing_job_employer(test_client, graphql_endpoint
         }
     }
     """
-    response = test_client.post(graphql_endpoint, json={"query": query})
-    assert response is not None
-    assert response.status_code == 200
-
-    result = response.json()
+    result = post_graphql(test_client, graphql_endpoint, query)
     job = result["data"]["job"]
     assert job["employer"]["id"] == updated_employer_id
 
@@ -112,10 +94,7 @@ def test_successfully_update_existing_job_employer(test_client, graphql_endpoint
         }}
     }}
     """
-    response = test_client.post(graphql_endpoint, json={"query": query})
-    assert response is not None
-    assert response.status_code == 200
-    result = response.json()
+    result = post_graphql(test_client, graphql_endpoint, query)
     jobs = result["data"]["employer"]["jobs"]
     assert 1 in [job["id"] for job in jobs]
 
@@ -132,12 +111,7 @@ def test_update_nonexisting_job(test_client, graphql_endpoint):
         }}
     }}
     """
-
-    response = test_client.post(graphql_endpoint, json={"query": query})
-    assert response is not None
-    assert response.status_code == 200
-
-    result = response.json()
+    result = post_graphql(test_client, graphql_endpoint, query)
     assert result["data"] is None
     assert "errors" in result
     assert "not found" in result["errors"][0]["message"]
@@ -154,11 +128,7 @@ def test_update_existing_job_insufficient_args(test_client, graphql_endpoint):
         }
     }
     """
-    response = test_client.post(graphql_endpoint, json={"query": query})
-    assert response is not None
-    assert response.status_code == 200
-
-    result = response.json()
+    result = post_graphql(test_client, graphql_endpoint, query)
     assert result["data"] is None
     assert "errors" in result
     assert (
@@ -175,11 +145,7 @@ def test_delete_existing_job(test_client, graphql_endpoint):
         deleteJob(jobId: 1)
     }
     """
-    response = test_client.post(graphql_endpoint, json={"query": query})
-    assert response is not None
-    assert response.status_code == 200
-
-    result = response.json()
+    result = post_graphql(test_client, graphql_endpoint, query)
     assert result["data"]["deleteJob"]
 
     # Check that the job has actually been deleted.
@@ -190,9 +156,5 @@ def test_delete_existing_job(test_client, graphql_endpoint):
         }
     }
     """
-    response = test_client.post(graphql_endpoint, json={"query": query})
-    assert response is not None
-    assert response.status_code == 200
-
-    result = response.json()
+    result = post_graphql(test_client, graphql_endpoint, query)
     assert result["data"]["job"] is None

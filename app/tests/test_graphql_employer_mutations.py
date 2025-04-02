@@ -1,5 +1,6 @@
 import pytest
 from app.db.data import EMPLOYERS_DATA, JOBS_DATA
+from .test_utils import post_graphql
 
 
 @pytest.mark.api
@@ -18,11 +19,7 @@ def test_add_employer_complete_info(test_client, graphql_endpoint):
         }}
     }}
     """
-    response = test_client.post(graphql_endpoint, json={"query": query})
-    assert response is not None
-    assert response.status_code == 200
-
-    result = response.json()
+    result = post_graphql(test_client, graphql_endpoint, query)
     employer = result["data"]["addEmployer"]
     assert employer["id"] == len(EMPLOYERS_DATA) + 1
     assert employer["name"] == employer_name
@@ -42,12 +39,7 @@ def test_successfully_update_existing_employer_name(test_client, graphql_endpoin
         }}
     }}
     """
-
-    response = test_client.post(graphql_endpoint, json={"query": query})
-    assert response is not None
-    assert response.status_code == 200
-
-    result = response.json()
+    result = post_graphql(test_client, graphql_endpoint, query)
     employer = result["data"]["updateEmployer"]
     assert employer["id"] == 1
     assert employer["name"] == updated_name
@@ -65,12 +57,7 @@ def test_update_nonexisting_employer(test_client, graphql_endpoint):
         }}
     }}
     """
-
-    response = test_client.post(graphql_endpoint, json={"query": query})
-    assert response is not None
-    assert response.status_code == 200
-
-    result = response.json()
+    result = post_graphql(test_client, graphql_endpoint, query)
     assert result["data"] is None
     assert "errors" in result
     assert "not found" in result["errors"][0]["message"]
@@ -87,11 +74,7 @@ def test_update_existing_employer_insufficient_args(test_client, graphql_endpoin
         }
     }
     """
-    response = test_client.post(graphql_endpoint, json={"query": query})
-    assert response is not None
-    assert response.status_code == 200
-
-    result = response.json()
+    result = post_graphql(test_client, graphql_endpoint, query)
     assert result["data"] is None
     assert "errors" in result
     assert (
@@ -108,11 +91,7 @@ def test_delete_existing_employer(test_client, graphql_endpoint):
         deleteEmployer(employerId: 1)
     }
     """
-    response = test_client.post(graphql_endpoint, json={"query": query})
-    assert response is not None
-    assert response.status_code == 200
-
-    result = response.json()
+    result = post_graphql(test_client, graphql_endpoint, query)
     assert result["data"]["deleteEmployer"]
 
     # Check that the job has actually been deleted.
@@ -148,11 +127,7 @@ def test_add_jobs_to_new_employer(test_client, graphql_endpoint):
         }}
     }}
     """
-    response = test_client.post(graphql_endpoint, json={"query": query})
-    assert response is not None
-    assert response.status_code == 200
-
-    result = response.json()
+    result = post_graphql(test_client, graphql_endpoint, query)
     employer = result["data"]["addEmployer"]
     assert employer["id"] == new_employer_id
 
@@ -164,11 +139,7 @@ def test_add_jobs_to_new_employer(test_client, graphql_endpoint):
         }}
     }}
     """
-    response = test_client.post(graphql_endpoint, json={"query": query})
-    assert response is not None
-    assert response.status_code == 200
-
-    result = response.json()
+    result = post_graphql(test_client, graphql_endpoint, query)
     job = result["data"]["addJob"]
     assert job["id"] == len(JOBS_DATA) + 1
 
@@ -180,11 +151,7 @@ def test_add_jobs_to_new_employer(test_client, graphql_endpoint):
         }}
     }}
     """
-    response = test_client.post(graphql_endpoint, json={"query": query})
-    assert response is not None
-    assert response.status_code == 200
-
-    result = response.json()
+    result = post_graphql(test_client, graphql_endpoint, query)
     job = result["data"]["updateJob"]
     assert job["id"] == 1
 
@@ -198,11 +165,7 @@ def test_add_jobs_to_new_employer(test_client, graphql_endpoint):
         }}
     }}
     """
-    response = test_client.post(graphql_endpoint, json={"query": query})
-    assert response is not None
-    assert response.status_code == 200
-
-    result = response.json()
+    result = post_graphql(test_client, graphql_endpoint, query)
     jobs = result["data"]["employer"]["jobs"]
     assert len(jobs) == 2
     assert sorted([job["id"] for job in jobs]) == [1, len(JOBS_DATA) + 1]

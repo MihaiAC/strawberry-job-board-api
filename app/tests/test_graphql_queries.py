@@ -1,5 +1,6 @@
 import pytest
 from app.db.data import JOBS_DATA, EMPLOYERS_DATA, USERS_DATA, APPLICATIONS_DATA
+from .test_utils import post_graphql
 
 
 @pytest.mark.api
@@ -12,12 +13,7 @@ def test_get_all_jobs(test_client, graphql_endpoint):
             }
         }
     """
-
-    response = test_client.post(graphql_endpoint, json={"query": query})
-    assert response is not None
-    assert response.status_code == 200
-
-    result = response.json()
+    result = post_graphql(test_client, graphql_endpoint, query)
     jobs = result["data"]["jobs"]
     assert len(jobs) == len(JOBS_DATA)
     assert sorted([job["title"] for job in jobs]) == sorted(
@@ -35,11 +31,7 @@ def test_get_job_by_id(test_client, graphql_endpoint):
         }
     }
     """
-    response = test_client.post(graphql_endpoint, json={"query": query})
-    assert response is not None
-    assert response.status_code == 200
-
-    result = response.json()
+    result = post_graphql(test_client, graphql_endpoint, query)
     job = result["data"]["job"]
     assert job["title"] == JOBS_DATA[0]["title"]
 
@@ -54,11 +46,7 @@ def test_get_all_employers(test_client, graphql_endpoint):
         }
     }
     """
-    response = test_client.post(graphql_endpoint, json={"query": query})
-    assert response is not None
-    assert response.status_code == 200
-
-    result = response.json()
+    result = post_graphql(test_client, graphql_endpoint, query)
     employers = result["data"]["employers"]
     assert len(employers) == len(EMPLOYERS_DATA)
     assert sorted([employer["name"] for employer in employers]) == sorted(
@@ -76,11 +64,7 @@ def test_get_employer_by_id(test_client, graphql_endpoint):
         }
     }
     """
-    response = test_client.post(graphql_endpoint, json={"query": query})
-    assert response is not None
-    assert response.status_code == 200
-
-    result = response.json()
+    result = post_graphql(test_client, graphql_endpoint, query)
     employer = result["data"]["employer"]
     assert employer["name"] == EMPLOYERS_DATA[0]["name"]
 
@@ -99,11 +83,7 @@ def test_get_employer_from_job(test_client, graphql_endpoint):
         }
     }
     """
-    response = test_client.post(graphql_endpoint, json={"query": query})
-    assert response is not None
-    assert response.status_code == 200
-
-    result = response.json()
+    result = post_graphql(test_client, graphql_endpoint, query)
     job = result["data"]["job"]
     assert job["title"] == JOBS_DATA[0]["title"]
     assert job["employer"]["name"] == EMPLOYERS_DATA[0]["name"]
@@ -122,11 +102,7 @@ def test_get_jobs_from_employer(test_client, graphql_endpoint):
         }
     }
     """
-    response = test_client.post(graphql_endpoint, json={"query": query})
-    assert response is not None
-    assert response.status_code == 200
-
-    result = response.json()
+    result = post_graphql(test_client, graphql_endpoint, query)
     employer = result["data"]["employer"]
     assert employer["name"] == EMPLOYERS_DATA[0]["name"]
     assert len(employer["jobs"]) == 2
@@ -222,11 +198,7 @@ def test_get_all_users(test_client, graphql_endpoint):
         }
     }
     """
-    response = test_client.post(graphql_endpoint, json={"query": query})
-    assert response is not None
-    assert response.status_code == 200
-
-    result = response.json()
+    result = post_graphql(test_client, graphql_endpoint, query)
     users = result["data"]["users"]
     assert len(users) == len(USERS_DATA)
     assert sorted([user["username"] for user in users]) == sorted(
@@ -253,11 +225,7 @@ def test_get_all_applications(test_client, graphql_endpoint):
         }
     }
     """
-    response = test_client.post(graphql_endpoint, json={"query": query})
-    assert response is not None
-    assert response.status_code == 200
-
-    result = response.json()
+    result = post_graphql(test_client, graphql_endpoint, query)
     applications = result["data"]["applications"]
     assert len(applications) == len(APPLICATIONS_DATA)
 
