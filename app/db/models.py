@@ -181,7 +181,6 @@ class User(Base):
 
 # TODO: Need to test what happens when trying to add existing
 # user-job application.
-# TODO: Test cascade deletes.
 class Application(Base):
     __tablename__ = "applications"
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))

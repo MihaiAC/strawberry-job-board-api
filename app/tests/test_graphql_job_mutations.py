@@ -158,3 +158,16 @@ def test_delete_existing_job(test_client, graphql_endpoint):
     """
     result = post_graphql(test_client, graphql_endpoint, query)
     assert result["data"]["job"] is None
+
+    # Test cascade delete on applications.
+    query = """
+    query {
+        applications {
+            id
+            jobId
+        }
+    }
+    """
+    result = post_graphql(test_client, graphql_endpoint, query)
+    for application in result["data"]["applications"]:
+        assert application["jobId"] != 1
