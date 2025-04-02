@@ -3,18 +3,12 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 from sqlalchemy.exc import OperationalError as SQLAlchemyOperationalError
-from app.db.data import EMPLOYERS_DATA, JOBS_DATA, USERS_DATA, APPLICATIONS_DATA
 from app.db.database import get_session
-from app.db.models import (
-    Base,
-    Employer as Employer_sql,
-    Job as Job_sql,
-    User as User_sql,
-    Application as Application_sql,
-)
+from app.db.models import Base
 from app.main import app
 from contextlib import asynccontextmanager
 from fastapi.testclient import TestClient
+from .test_utils import load_test_tables
 
 
 # Assumption: Docker container containing test db has to be running
@@ -65,14 +59,7 @@ def db_session(db_url):
     session = TestingSessionLocal(bind=connection)
 
     # Initialise test db.
-    session.add_all([Employer_sql(**x) for x in EMPLOYERS_DATA])
-    session.flush()
-    session.add_all([Job_sql(**x) for x in JOBS_DATA])
-    session.flush()
-    session.add_all([User_sql(**x) for x in USERS_DATA])
-    session.flush()
-    session.add_all([Application_sql(**x) for x in APPLICATIONS_DATA])
-    session.flush()
+    load_test_tables(session)
 
     yield session
 

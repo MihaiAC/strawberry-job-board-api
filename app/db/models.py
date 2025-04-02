@@ -97,7 +97,7 @@ class Base(DeclarativeBase):
         gql_class_init_args = {
             field: getattr(self, field)
             for field in self.__table__.columns.keys()
-            if field != "password"
+            if field != "password_hash"
         }
 
         # Handle nested objects.
@@ -169,7 +169,7 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(254))
 
     # Plaintext for now.
-    password: Mapped[str] = mapped_column(String(30))
+    password_hash: Mapped[str] = mapped_column(String(128))
     role: Mapped[str] = mapped_column(String[20])
     applications: Mapped[List["Application"]] = relationship(
         "Application",

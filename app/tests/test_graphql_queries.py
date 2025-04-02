@@ -165,6 +165,7 @@ def test_get_all_users(test_client, graphql_endpoint):
     assert sorted([user["username"] for user in users]) == sorted(
         user["username"] for user in USERS_DATA
     )
+    # TODO: Still needed?
     for user in users:
         assert "password" not in user
 

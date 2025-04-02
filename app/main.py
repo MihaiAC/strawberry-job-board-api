@@ -12,6 +12,10 @@ from .db.models import Employer as Employer_sql, Job as Job_sql
 from sqlalchemy.orm import Session
 
 
+# TODO: How can you limit a query's lateral depth?
+# TODO: How can you limit the number of records returned?
+# TODO: How can you limit the number of queries a user can perform in a
+# given time window?
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     prepare_database()
