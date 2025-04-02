@@ -1,8 +1,7 @@
 import strawberry
 from strawberry.types import Info
 from typing import List, Optional
-from app.gql.types import Employer as Employer_gql
-from app.db.database import Employer_sql
+from app.db.models import Employer as Employer_sql, Employer_gql
 from sqlalchemy.orm import joinedload
 from app.gql.utils import to_employer_gql
 

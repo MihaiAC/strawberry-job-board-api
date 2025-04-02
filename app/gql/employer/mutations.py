@@ -1,7 +1,6 @@
 import strawberry
 from strawberry.types import Info
-from app.gql.types import Employer as Employer_gql
-from app.db.database import Employer_sql
+from app.db.models import Employer as Employer_sql, Employer_gql
 from app.gql.utils import to_employer_gql
 from typing import Optional
 

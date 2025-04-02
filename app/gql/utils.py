@@ -1,10 +1,8 @@
-from .types import (
-    Job as Job_gql,
-    Employer as Employer_gql,
-)
-from app.db.database import (
-    Employer_sql,
-    Job_sql,
+from app.db.models import (
+    Job as Job_sql,
+    Employer as Employer_sql,
+    Job_gql,
+    Employer_gql,
 )
 
 

@@ -1,8 +1,7 @@
 import strawberry
 from typing import List
 from strawberry.types import Info
-from app.gql.types import Application as Application_gql
-from app.db.models import Application as Application_sql
+from app.db.models import Application as Application_sql, Application_gql
 
 
 @strawberry.type

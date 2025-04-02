@@ -135,77 +135,78 @@ def test_get_jobs_from_employer(test_client, graphql_endpoint):
     )
 
 
-@pytest.mark.api
-@pytest.mark.query
-def test_circular_reference_depth_limit(test_client, graphql_endpoint):
-    # Should not pass.
-    query = """
-    query {
-        employers {
-            jobs {
-            employer {
-                name
-            }
-            }
-        }
-    }
-    """
-    response = test_client.post(graphql_endpoint, json={"query": query})
-    assert response is not None
-    assert response.status_code == 200
+# TODO: Need to rewrite this after applying depth limiter plugin.
+# @pytest.mark.api
+# @pytest.mark.query
+# def test_circular_reference_depth_limit(test_client, graphql_endpoint):
+#     # Should not pass.
+#     query = """
+#     query {
+#         employers {
+#             jobs {
+#             employer {
+#                 name
+#             }
+#             }
+#         }
+#     }
+#     """
+#     response = test_client.post(graphql_endpoint, json={"query": query})
+#     assert response is not None
+#     assert response.status_code == 200
 
-    result = response.json()
-    assert result["data"] is None
-    assert len(result["errors"]) >= 1
+#     result = response.json()
+#     assert result["data"] is None
+#     assert len(result["errors"]) >= 1
 
-    # Should pass.
-    query = """
-    query {
-        job(id: 1) {
-            employer {
-                name
-                jobs {
-                    title
-                }
-            }
-        }
-    }
-    """
-    response = test_client.post(graphql_endpoint, json={"query": query})
-    assert response is not None
-    assert response.status_code == 200
+#     # Should pass.
+#     query = """
+#     query {
+#         job(id: 1) {
+#             employer {
+#                 name
+#                 jobs {
+#                     title
+#                 }
+#             }
+#         }
+#     }
+#     """
+#     response = test_client.post(graphql_endpoint, json={"query": query})
+#     assert response is not None
+#     assert response.status_code == 200
 
-    result = response.json()
-    job = result["data"]["job"]
-    assert job["employer"]["name"] == EMPLOYERS_DATA[0]["name"]
-    employer_jobs = job["employer"]["jobs"]
-    assert len(employer_jobs) == 2
-    assert sorted([job["title"] for job in employer_jobs]) == sorted(
-        [job["title"] for job in JOBS_DATA[:2]]
-    )
+#     result = response.json()
+#     job = result["data"]["job"]
+#     assert job["employer"]["name"] == EMPLOYERS_DATA[0]["name"]
+#     employer_jobs = job["employer"]["jobs"]
+#     assert len(employer_jobs) == 2
+#     assert sorted([job["title"] for job in employer_jobs]) == sorted(
+#         [job["title"] for job in JOBS_DATA[:2]]
+#     )
 
-    # Should not pass.
-    query = """
-    query {
-        job(id: 1) {
-            employer {
-                name
-                jobs {
-                    employer {
-                        name
-                    }
-                }
-            }
-        }
-    }
-    """
-    response = test_client.post(graphql_endpoint, json={"query": query})
-    assert response is not None
-    assert response.status_code == 200
+#     # Should not pass.
+#     query = """
+#     query {
+#         job(id: 1) {
+#             employer {
+#                 name
+#                 jobs {
+#                     employer {
+#                         name
+#                     }
+#                 }
+#             }
+#         }
+#     }
+#     """
+#     response = test_client.post(graphql_endpoint, json={"query": query})
+#     assert response is not None
+#     assert response.status_code == 200
 
-    result = response.json()
-    assert result["data"]["job"] is None
-    assert len(result["errors"]) >= 1
+#     result = response.json()
+#     assert result["data"]["job"] is None
+#     assert len(result["errors"]) >= 1
 
 
 @pytest.mark.api

@@ -4,6 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 from sqlalchemy.exc import OperationalError as SQLAlchemyOperationalError
 from app.db.data import EMPLOYERS_DATA, JOBS_DATA, USERS_DATA, APPLICATIONS_DATA
+from app.db.database import get_session
 from app.db.models import (
     Base,
     Employer as Employer_sql,
@@ -11,7 +12,6 @@ from app.db.models import (
     User as User_sql,
     Application as Application_sql,
 )
-from app.db.database import get_session
 from app.main import app
 from contextlib import asynccontextmanager
 from fastapi.testclient import TestClient

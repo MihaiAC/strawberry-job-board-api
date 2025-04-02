@@ -1,8 +1,7 @@
 import strawberry
 from typing import List
 from strawberry.types import Info
-from app.gql.types import User as User_gql
-from app.db.models import User as User_sql
+from app.db.models import User as User_sql, User_gql
 
 
 @strawberry.type

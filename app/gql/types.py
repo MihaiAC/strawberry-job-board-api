@@ -1,46 +1,43 @@
 import strawberry
-from typing import List
+from typing import List, Optional
 
 
-# Way to handle circular references.
+class Base_gql:
+    pass
+
+
 @strawberry.type
-class Employer:
+class Employer_gql(Base_gql):
     id: int
     name: str
     contact_email: str
     industry: str
-    jobs: List["Job"]
+    jobs: Optional[List["Job_gql"]]
 
 
 @strawberry.type
-class Job:
+class Job_gql(Base_gql):
     id: int
     title: str
     description: str
     employer_id: int
-    employer: Employer
-    applications: List["Application"]
+    employer: Optional[Employer_gql]
+    applications: Optional[List["Application_gql"]]
 
 
 @strawberry.type
-class User:
+class User_gql(Base_gql):
     id: int
     username: str
     email: str
     role: str
-    applications: List["Application"]
+    applications: Optional[List["Application_gql"]]
 
 
 @strawberry.type
-class Application:
+class Application_gql(Base_gql):
     id: int
     user_id: int
     job_id: int
-    user: User
-    job: Job
-
-
-@strawberry.type
-class Success:
-    success: bool
-    message: str
+    user: Optional[User_gql]
+    job: Optional[Job_gql]
