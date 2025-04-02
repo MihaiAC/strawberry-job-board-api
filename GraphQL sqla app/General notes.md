@@ -10,9 +10,16 @@ This query parsing is complicated by the fact that you have to somehow map every
 
 I also found **[strawberry-sqlalchemy](https://github.com/strawberry-graphql/strawberry-sqlalchemy)**, but it doesn't seem to offer the freedom you need (maybe I'm wrong).
 
-Anyway, since this is a toy example I'll just limit the query depth to 1 and use "joinedload" naively.
+Since this is a toy example I'll just limit the query depth to 1 and use "joinedload" naively. Maybe I just missed something crucial and this is much easier than I think it is.
 
-Maybe I just missed something crucial and this is much easier than I think it is.
+Today's lesson: with GraphQL (and the current backend stack at least) prefer breadth over depth in queries. I think deeply nested queries are ill suited for SQL backends and would be better suited for graph DBs (d'oh).
+
+If parsing the query were easier, I could also ban certain nested queries from happening (similar to complexity score) - e.g: two one-to-many joins in the same query.
+
+#### Class duplication
+Every entity has two classes which are tightly coupled  - the sql version used by SQLA and the gql version used by Strawberry. I don't see how they couldn't be tightly coupled - they basically need to have the same fields even though they serve different purposes 
+
+This creates a lot of extra headaches (e.g: circular reference errors) and extra clutter. Since they are tightly coupled anyway, I imported the gql types in db.models; in all the other files that required the gql types I imported them from db.models (since I would also import the sqla types anyway in most cases).
 
 ### SQLAlchemy
 
