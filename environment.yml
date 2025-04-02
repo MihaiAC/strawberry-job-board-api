@@ -10,6 +10,8 @@ dependencies:
   - _openmp_mutex=5.1=1_gnu
   - annotated-types=0.6.0=py313h06a4308_0
   - anyio=4.6.2=py313h06a4308_0
+  - argon2-cffi=23.1.0=pyhd8ed1ab_1
+  - argon2-cffi-bindings=21.2.0=py313h5eee18b_1
   - bzip2=1.0.8=h5eee18b_6
   - ca-certificates=2025.2.25=h06a4308_0
   - certifi=2025.1.31=py313h06a4308_0
@@ -78,9 +80,9 @@ dependencies:
   - sqlalchemy=2.0.37=py313h00e1ef3_0
   - sqlite=3.45.3=h5eee18b_0
   - starlette=0.46.1=pyha770c72_0
-  - strawberry-graphql=0.262.5=pyh29332c3_0
-  - strawberry-graphql-with-cli=0.262.5=h29332c3_0
-  - strawberry-graphql-with-fastapi=0.262.5=h29332c3_0
+  - strawberry-graphql=0.263.0=pyh29332c3_0
+  - strawberry-graphql-with-cli=0.263.0=h29332c3_0
+  - strawberry-graphql-with-fastapi=0.263.0=h29332c3_0
   - tk=8.6.14=h39e8969_0
   - tomli=2.0.1=py313h06a4308_1
   - typer=0.15.2=pyhff008b6_0
