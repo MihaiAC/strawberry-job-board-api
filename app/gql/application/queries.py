@@ -8,6 +8,4 @@ from app.db.models import Application as Application_sql, Application_gql
 class ApplicationQuery:
     @strawberry.field
     def applications(self, info: Info) -> List[Application_gql]:
-        db_session = info.context["db_session"]
-        applications = db_session.query(Application_sql).all()
-        return applications
+        return Application_sql.fetch_and_transform_to_gql(info)
