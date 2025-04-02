@@ -104,9 +104,14 @@ class Base(DeclarativeBase):
         for fk_field in self.get_fk_field_names():
             if kwargs.get(fk_field, False):
                 nested_sql_obj = getattr(self, fk_field)
-                gql_class_init_args[fk_field] = (
-                    nested_sql_obj.to_gql() if nested_sql_obj else None
-                )
+                if isinstance(nested_sql_obj, list):
+                    gql_class_init_args[fk_field] = [
+                        obj.to_gql() for obj in nested_sql_obj
+                    ]
+                else:
+                    gql_class_init_args[fk_field] = (
+                        nested_sql_obj.to_gql() if nested_sql_obj else None
+                    )
             else:
                 gql_class_init_args[fk_field] = None
 
