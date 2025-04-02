@@ -1,5 +1,6 @@
 from strawberry import Schema
 from strawberry.fastapi import GraphQLRouter
+from strawberry.extensions import QueryDepthLimiter
 
 from fastapi import FastAPI, Depends, Request
 from contextlib import asynccontextmanager
@@ -21,7 +22,15 @@ async def get_context(request: Request, db_session: Session = Depends(get_sessio
     return {"db_session": db_session}
 
 
-schema = Schema(query=Query, mutation=Mutation)
+schema = Schema(
+    query=Query,
+    mutation=Mutation,
+    extensions=[
+        QueryDepthLimiter(
+            max_depth=2,
+        )
+    ],
+)
 graphql_app = GraphQLRouter(schema, context_getter=get_context)
 
 app = FastAPI(lifespan=lifespan)
