@@ -23,7 +23,10 @@ async def lifespan(app: FastAPI):
 
 
 async def get_context(request: Request, db_session: Session = Depends(get_session)):
-    return {"db_session": db_session}
+    return {
+        "db_session": db_session,
+        "request": request,
+    }
 
 
 schema = Schema(

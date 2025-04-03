@@ -14,7 +14,7 @@ def test_login_correct_details(test_client, graphql_endpoint):
     }}
     """
     result = post_graphql(test_client, graphql_endpoint, query)
-    assert "errors" not in result["data"]
+    assert "errors" not in result
     assert "loginUser" in result["data"]
 
     jwt_token = result["data"]["loginUser"]

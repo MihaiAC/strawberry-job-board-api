@@ -9,6 +9,7 @@ from sqlalchemy.orm import (
     class_mapper,
     Query,
     joinedload,
+    Session,
 )
 
 from app.gql.types import (
@@ -22,7 +23,7 @@ from app.gql.types import (
 from strawberry.types import Info
 
 from sqlalchemy import String, ForeignKey, UniqueConstraint
-from typing import List, Tuple, Union, Dict
+from typing import List, Tuple, Union, Dict, Optional
 
 SQL_CLASS_NAME_TO_CLASS = {"Employer"}
 
@@ -176,6 +177,13 @@ class User(Base):
         back_populates="user",
         cascade="all, delete-orphan",
     )
+
+    # TODO: Consider repository pattern if there are multiple of those
+    # functions by the end. Should probably replace ORM operations in
+    # mutations / queries.
+    @staticmethod
+    def get_user_by_email(db_session: Session, email: str) -> Optional[User]:
+        return db_session.query(User).filter_by(email=email).first()
 
 
 # TODO: Need to test what happens when trying to add existing
