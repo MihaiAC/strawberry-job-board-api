@@ -11,3 +11,8 @@ PORT = os.getenv("PORT")
 
 # postgresql+psycopg = "dialect"
 DATABASE_URL = f"postgresql+psycopg://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}"
+
+# TODO: How to get/mock these in conftest?
+JWT_KEY = os.getenv("JWT_KEY")
+JWT_ALGORITHM = os.getenv("JWT_ALGORITHM")
+JWT_EXPIRATION_TIME_MINUTES = os.getenv("JWT_EXPIRATION_TIME_MINUTES")

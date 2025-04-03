@@ -8,10 +8,7 @@ from app.db.models import (
     User as User_sql,
 )
 from copy import deepcopy
-
-
-# TODO: temporary.
-from argon2 import PasswordHasher
+from app.auth_utils import hash_password
 
 
 def post_graphql(
@@ -33,10 +30,11 @@ def load_test_tables(session: Session):
     session.flush()
 
     users = []
-    password_hasher = PasswordHasher()
     for user in USERS_DATA:
+        # Deep copy needed since this is run once per test and we don't
+        # want to modify the global USERS_DATA.
         user_copy = deepcopy(user)
-        user_copy["password_hash"] = password_hasher.hash(user_copy["password"])
+        user_copy["password_hash"] = hash_password(user_copy["password"])
         del user_copy["password"]
         users.append(User_sql(**user_copy))
 
