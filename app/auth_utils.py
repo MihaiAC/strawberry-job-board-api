@@ -10,7 +10,7 @@ from fastapi import Request
 
 def generate_jwt_token(email: str) -> str:
     expiration_time = datetime.now(timezone.utc) + timedelta(
-        minutes=int(JWT_EXPIRATION_TIME_MINUTES)
+        minutes=JWT_EXPIRATION_TIME_MINUTES
     )
 
     payload = {
