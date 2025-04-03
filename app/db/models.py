@@ -178,13 +178,6 @@ class User(Base):
         cascade="all, delete-orphan",
     )
 
-    # TODO: Consider repository pattern if there are multiple of those
-    # functions by the end. Should probably replace ORM operations in
-    # mutations / queries.
-    @staticmethod
-    def get_user_by_email(db_session: Session, email: str) -> Optional[User]:
-        return db_session.query(User).filter_by(email=email).first()
-
 
 # TODO: Need to test what happens when trying to add existing
 # user-job application.

@@ -16,6 +16,7 @@ from sqlalchemy.orm import Session
 # TODO: How can you limit the number of records returned?
 # TODO: How can you limit the number of queries a user can perform in a
 # given time window?
+# TODO: Should use strawberry input types.
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     prepare_database()

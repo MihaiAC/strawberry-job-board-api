@@ -70,3 +70,9 @@ def decode_jwt_token_return_email(jwt_token: str) -> str:
         return payload["email"]
     except InvalidSignatureError:
         raise GraphQLError("Invalid authentication token.")
+
+
+def get_user_email_from_request_token(request: Request) -> str:
+    token = extract_token_from_request(request)
+    email = decode_jwt_token_return_email(token)
+    return email
