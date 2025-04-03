@@ -108,3 +108,24 @@ def employers_endpoint():
 @pytest.fixture(scope="function")
 def graphql_endpoint():
     return "/graphql"
+
+
+@pytest.fixture(scope="session")
+def admin_header() -> str:
+    admin_email = get_test_admin_email()
+    token = generate_jwt_token(admin_email)
+    return {"Authorization": f"Bearer {token}"}
+
+
+@pytest.fixture(scope="session")
+def user_header() -> str:
+    user_email = get_test_non_admin_email()
+    token = generate_jwt_token(user_email)
+    return {"Authorization": f"Bearer {token}"}
+
+
+@pytest.fixture(scope="session")
+def invalid_token_header() -> str:
+    email = "not even an email"
+    token = generate_jwt_token(email)
+    return {"Authorization": f"Bearer {token}"}
