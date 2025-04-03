@@ -1,6 +1,6 @@
 import pytest
 from app.db.data import JOBS_DATA, EMPLOYERS_DATA, USERS_DATA, APPLICATIONS_DATA
-from .test_utils import post_graphql
+from .utils import post_graphql
 from collections import defaultdict
 
 

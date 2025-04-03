@@ -1,6 +1,7 @@
 import pytest
 from app.db.data import USERS_DATA
-from .test_utils import post_graphql
+from .utils import post_graphql
+from app.auth_utils import decode_jwt_token_return_email
 
 
 @pytest.mark.api
@@ -19,6 +20,7 @@ def test_login_correct_details(test_client, graphql_endpoint):
 
     jwt_token = result["data"]["loginUser"]
     assert jwt_token is not None and len(jwt_token) > 0
+    assert user_email == decode_jwt_token_return_email(jwt_token)
 
 
 @pytest.mark.api

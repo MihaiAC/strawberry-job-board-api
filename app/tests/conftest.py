@@ -8,7 +8,12 @@ from app.db.models import Base
 from app.main import app
 from contextlib import asynccontextmanager
 from fastapi.testclient import TestClient
-from .test_utils import load_test_tables
+from .utils import (
+    load_test_tables,
+    get_test_admin_email,
+    get_test_non_admin_email,
+)
+from app.auth_utils import generate_jwt_token
 
 
 # Assumption: Docker container containing test db has to be running

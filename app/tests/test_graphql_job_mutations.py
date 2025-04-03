@@ -1,6 +1,6 @@
 import pytest
 from app.db.data import EMPLOYERS_DATA, JOBS_DATA
-from .test_utils import post_graphql
+from .utils import post_graphql
 
 
 @pytest.mark.api

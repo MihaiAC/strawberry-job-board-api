@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from app.db.models import Base
 from app.settings.config import DATABASE_URL
-from app.tests.test_utils import load_test_tables
+from app.tests.utils import load_test_tables
 
 # Create engine.
 engine = create_engine(DATABASE_URL, echo=True)
