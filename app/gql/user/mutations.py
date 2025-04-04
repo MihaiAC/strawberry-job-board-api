@@ -2,10 +2,11 @@ import strawberry
 from strawberry.types import Info
 from app.db.models import User as User_sql, User_gql
 from graphql import GraphQLError
-from app.auth_utils import (
+from app.auth.auth_utils import (
     verify_password,
     generate_jwt_token,
     hash_password,
+    require_role,
 )
 from app.db.repositories.user_repository import UserRepository
 from app.errors.custom_errors import ResourceNotFound
@@ -13,6 +14,7 @@ from app.errors.error_messages import (
     USER_ALREADY_EXISTS,
     INSUFFICIENT_PRIVILEGES,
 )
+from app.auth.roles import Role
 
 
 @strawberry.type
@@ -35,33 +37,29 @@ class LoginMutation:
 
 @strawberry.type
 class UserMutation:
+
     @strawberry.mutation
+    @require_role([Role.ADMIN])
     def add_user(
         username: str, email: str, password: str, role: str, info: Info
     ) -> User_gql:
         db_session = info.context["db_session"]
 
         # Only an admin can add another admin.
-        if role == "admin":
-            request = info.context["request"]
-            authenticated_user = UserRepository.get_authenticated_user(
-                db_session, request
-            )
-
-            if authenticated_user.role != "admin":
+        if role == Role.ADMIN:
+            if info.context["user"] is None or info.context["user"].role != Role.ADMIN:
                 raise GraphQLError(INSUFFICIENT_PRIVILEGES)
 
-        user = UserRepository.get_user_by_email(db_session, email)
-
-        if user:
+        user_to_add = UserRepository.get_user_by_email(db_session, email)
+        if user_to_add:
             raise GraphQLError(USER_ALREADY_EXISTS)
 
         password_hash = hash_password(password)
-        user = User_sql(
+        user_to_add = User_sql(
             username=username, email=email, password_hash=password_hash, role=role
         )
-        db_session.add(user)
+        db_session.add(user_to_add)
         db_session.commit()
-        db_session.refresh(user)
+        db_session.refresh(user_to_add)
 
-        return user.to_gql()
+        return user_to_add.to_gql()

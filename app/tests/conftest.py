@@ -13,7 +13,7 @@ from .utils import (
     get_test_admin_email,
     get_test_non_admin_email,
 )
-from app.auth_utils import generate_jwt_token
+from app.auth.auth_utils import generate_jwt_token
 
 
 # Assumption: Docker container containing test db has to be running

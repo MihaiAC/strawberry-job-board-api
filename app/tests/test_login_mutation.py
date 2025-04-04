@@ -1,7 +1,7 @@
 import pytest
 from app.db.data import USERS_DATA
 from .utils import post_graphql
-from app.auth_utils import decode_jwt_token_return_email
+from app.auth.auth_utils import decode_jwt_token_return_email
 from app.errors.error_messages import INVALID_PASSWORD
 from app.errors.custom_errors import ResourceNotFound
 

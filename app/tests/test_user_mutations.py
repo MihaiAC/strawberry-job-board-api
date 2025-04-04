@@ -53,14 +53,8 @@ def test_add_new_user_unauth(test_client, graphql_endpoint):
     }}
     """
     result = post_graphql(test_client, graphql_endpoint, query)
-    assert "addUser" in result["data"]
-    assert "errors" not in result
-
-    user = result["data"]["addUser"]
-    assert user["username"] == username
-    assert user["email"] == email
-    assert user["role"] == role
-    assert user["id"] == len(USERS_DATA) + 1
+    assert "errors" in result
+    assert result["errors"][0]["message"] == INVALID_AUTHORIZATION_HEADER
 
 
 @pytest.mark.api
@@ -88,7 +82,7 @@ def test_add_existing_user_unauth(test_client, graphql_endpoint):
     """
     result = post_graphql(test_client, graphql_endpoint, query)
     assert "errors" in result
-    assert result["errors"][0]["message"] == USER_ALREADY_EXISTS
+    assert result["errors"][0]["message"] == INVALID_AUTHORIZATION_HEADER
 
     assert_no_new_user_added(test_client, graphql_endpoint)
 

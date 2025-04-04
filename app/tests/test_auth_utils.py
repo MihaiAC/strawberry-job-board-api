@@ -1,4 +1,4 @@
-from app.auth_utils import (
+from app.auth.auth_utils import (
     generate_jwt_token,
     decode_jwt_token_return_email,
     hash_password,

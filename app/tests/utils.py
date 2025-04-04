@@ -8,7 +8,7 @@ from app.db.models import (
     User as User_sql,
 )
 from copy import deepcopy
-from app.auth_utils import hash_password
+from app.auth.auth_utils import hash_password
 
 
 def post_graphql(
