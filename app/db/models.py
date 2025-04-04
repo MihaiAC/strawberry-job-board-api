@@ -78,11 +78,11 @@ class Base(DeclarativeBase):
         selected_fields: str,
         attr_name: str,
         attr_value: any,
-    ) -> Self:
+    ) -> List[Self]:
         query = db_session.query(cls)
         query, _ = cls.apply_joins(query, selected_fields)
         query = query.filter(getattr(cls, attr_name) == attr_value)
-        obj = query.first()
+        obj = query.all()
         return obj
 
     @classmethod
@@ -92,12 +92,12 @@ class Base(DeclarativeBase):
         selected_fields: str,
         attr_name: str,
         attr_value: any,
-    ) -> Self:
+    ) -> List[Base_gql]:
         query = db_session.query(cls)
         query, FKs_to_convert = cls.apply_joins(query, selected_fields)
         query = query.filter(getattr(cls, attr_name) == attr_value)
-        obj = query.first()
-        return obj.to_gql(**FKs_to_convert)
+        filtered_objs = query.all()
+        return [obj.to_gql(**FKs_to_convert) for obj in filtered_objs]
 
     # TODO: Remove when completely replaced.
     @deprecated
