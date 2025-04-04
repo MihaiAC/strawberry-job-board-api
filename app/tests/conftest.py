@@ -11,7 +11,7 @@ from fastapi.testclient import TestClient
 from .utils import (
     load_test_tables,
     get_test_admin_email,
-    get_test_non_admin_email,
+    get_test_first_non_admin_email,
 )
 from app.auth.auth_utils import generate_jwt_token
 
@@ -119,7 +119,7 @@ def admin_header() -> str:
 
 @pytest.fixture(scope="session")
 def user_header() -> str:
-    user_email = get_test_non_admin_email()
+    user_email = get_test_first_non_admin_email()
     token = generate_jwt_token(user_email)
     return {"Authorization": f"Bearer {token}"}
 

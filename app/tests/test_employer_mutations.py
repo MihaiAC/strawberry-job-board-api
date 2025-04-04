@@ -1,6 +1,9 @@
 import pytest
 from app.db.data import EMPLOYERS_DATA, JOBS_DATA
 from .utils import post_graphql
+from app.db.repositories.employer_repository import EmployerRepository
+from app.db.repositories.job_repository import JobRepository
+from app.db.repositories.application_repository import ApplicationRepository
 
 
 @pytest.mark.api
@@ -65,55 +68,43 @@ def test_update_nonexisting_employer(test_client, graphql_endpoint):
 
 @pytest.mark.api
 @pytest.mark.mutation
-def test_delete_existing_employer(test_client, graphql_endpoint):
-    query = """
-    mutation {
-        deleteEmployer(employerId: 1)
-    }
+def test_delete_existing_employer(test_client, graphql_endpoint, db_session):
+    employer_id = 1
+    query = f"""
+    mutation {{
+        deleteEmployer(employerId: {employer_id})
+    }}
     """
     result = post_graphql(test_client, graphql_endpoint, query)
     assert result["data"]["deleteEmployer"]
 
-    # Check that the job has actually been deleted.
-    query = """
-    query {
-        employer(id: 1) {
-            name
-        }
-    }
-    """
-    result = post_graphql(test_client, graphql_endpoint, query)
-    assert result["data"]["employer"] is None
+    # Check that the employer has actually been deleted.
+    employer = EmployerRepository.get_all_employers_by_id(
+        db_session=db_session,
+        selected_fields="",
+        id=employer_id,
+        gql=False,
+    )
+    assert len(employer) == 0
 
-    # Test cascade deletes.
-    query = """
-    query {
-        jobs {
-            id
-            employerId
-        }
-    }
-    """
-    result = post_graphql(test_client, graphql_endpoint, query)
+    # Check that the jobs belonging to the employer have been deleted.
+    jobs = JobRepository.get_all_jobs(
+        db_session=db_session,
+        selected_fields="",
+        gql=False,
+    )
     remaining_job_ids = []
-    jobs = result["data"]["jobs"]
-    for job in jobs:
-        assert job["employerId"] != 1
-        remaining_job_ids.append(job["id"])
+    for job_sql in jobs:
+        assert job_sql.employer_id != employer_id
+        remaining_job_ids.append(job_sql.id)
 
-    query = """
-    query {
-        applications {
-            id
-            jobId
-            userId
-        }
-    }
-    """
-    result = post_graphql(test_client, graphql_endpoint, query)
-    applications = result["data"]["applications"]
-    for application in applications:
-        assert application["jobId"] in remaining_job_ids
+    # Check that the applications corresponding to the deleted jobs
+    # have been deleted.
+    remaining_applications = ApplicationRepository.get_all_applications(
+        db_session=db_session, selected_fields="", gql=False
+    )
+    for application in remaining_applications:
+        assert application.job_id in remaining_job_ids
 
 
 @pytest.mark.api

@@ -1,6 +1,6 @@
 import pytest
 from app.db.data import JOBS_DATA, EMPLOYERS_DATA, USERS_DATA, APPLICATIONS_DATA
-from .utils import post_graphql
+from .utils import post_graphql, get_test_first_non_admin_id
 from collections import defaultdict
 
 
@@ -172,7 +172,7 @@ def test_get_all_users(test_client, graphql_endpoint):
 
 @pytest.mark.api
 @pytest.mark.query
-def test_get_all_applications(test_client, graphql_endpoint):
+def test_get_all_applications_admin(test_client, graphql_endpoint, admin_header):
     query = """
     query {
         applications {
@@ -189,7 +189,7 @@ def test_get_all_applications(test_client, graphql_endpoint):
         }
     }
     """
-    result = post_graphql(test_client, graphql_endpoint, query)
+    result = post_graphql(test_client, graphql_endpoint, query, headers=admin_header)
     applications = result["data"]["applications"]
     assert len(applications) == len(APPLICATIONS_DATA)
 
@@ -214,3 +214,39 @@ def test_get_all_applications(test_client, graphql_endpoint):
         username = applications[idx]["user"]["username"]
         user_id = applications[idx]["userId"]
         assert username == user_id_to_username[user_id]
+
+
+@pytest.mark.api
+@pytest.mark.query
+def test_get_all_applications_user(test_client, graphql_endpoint, user_header):
+    query = """
+    query {
+        applications {
+            jobId
+            job {
+                id
+                title
+            }
+            userId
+            user {
+                id
+                username
+            }
+        }
+    }
+    """
+    result = post_graphql(test_client, graphql_endpoint, query, headers=user_header)
+    applications = result["data"]["applications"]
+
+    # Get the authenticated user's ID.
+    auth_user_id = get_test_first_non_admin_id()
+
+    # Test we are retrieving only the applications of the current user.
+    application_count = 0
+    for application in APPLICATIONS_DATA:
+        if application["user_id"] == auth_user_id:
+            application_count += 1
+
+    assert len(applications) == application_count
+    for application in applications:
+        assert application["user"]["id"] == application["userId"] == auth_user_id

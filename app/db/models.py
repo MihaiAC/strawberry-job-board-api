@@ -90,8 +90,9 @@ class Base(DeclarativeBase):
             return filtered_objs
 
     # TODO: Remove when completely replaced.
-    @deprecated
+
     @classmethod
+    @deprecated
     def fetch_and_transform_to_gql(
         cls, info: Info, id: int = None, **kwargs
     ) -> Union[Base_gql, List[Base_gql]]:

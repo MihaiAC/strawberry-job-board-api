@@ -9,6 +9,7 @@ from app.db.models import (
 )
 from copy import deepcopy
 from app.auth.auth_utils import hash_password
+from typing import Tuple
 
 
 def post_graphql(
@@ -55,8 +56,22 @@ def get_test_admin_email() -> str:
     raise Exception("Test data does not have an admin user.")
 
 
-def get_test_non_admin_email() -> str:
-    for user in USERS_DATA:
+def get_test_first_non_admin_user() -> Tuple[int, dict]:
+    for idx, user in enumerate(USERS_DATA):
         if user["role"] != "admin":
-            return user["email"]
+            return idx, user
     raise Exception("Test data does not have a non-admin user.")
+
+
+def get_test_first_non_admin_email() -> str:
+    _, user = get_test_first_non_admin_user()
+    return user["email"]
+
+
+def get_test_first_non_admin_id() -> str:
+    idx, _ = get_test_first_non_admin_user()
+    return idx + 1
+
+
+class BaseQueries:
+    APPLICATIONS = "query { applications { id } }"
