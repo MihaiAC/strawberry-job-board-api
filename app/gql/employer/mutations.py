@@ -2,6 +2,7 @@ import strawberry
 from strawberry.types import Info
 from app.db.models import Employer as Employer_sql, Employer_gql
 from typing import Optional
+from app.errors.custom_errors import ResourceNotFound
 
 
 @strawberry.type
@@ -38,12 +39,6 @@ class EmployerMutation:
         At least one of title, description, employer_id should be provided.
         Throws error if no employer with the given id has been found.
         """
-        # Validate inputs.
-        if name is None and industry is None and contact_email is None:
-            raise Exception(
-                "Please provide at least one employer field you would like to modify."
-            )
-
         db_session = info.context["db_session"]
 
         # Retrieve the employer object to be updated.
@@ -53,7 +48,7 @@ class EmployerMutation:
             .first()
         )
         if not employer_sql:
-            raise Exception("Employer not found")
+            raise ResourceNotFound("Employer")
 
         if name is not None:
             employer_sql.name = name
@@ -83,7 +78,7 @@ class EmployerMutation:
         )
 
         if not employer_sql:
-            raise Exception("Employer not found")
+            raise ResourceNotFound("Employer")
 
         db_session.delete(employer_sql)
         db_session.commit()

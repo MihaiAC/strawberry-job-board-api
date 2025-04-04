@@ -2,6 +2,8 @@ import pytest
 from app.db.data import USERS_DATA
 from .utils import post_graphql
 from app.auth_utils import decode_jwt_token_return_email
+from app.errors.error_messages import INVALID_PASSWORD
+from app.errors.custom_errors import ResourceNotFound
 
 
 @pytest.mark.api
@@ -36,7 +38,7 @@ def test_login_incorrect_email(test_client, graphql_endpoint):
     result = post_graphql(test_client, graphql_endpoint, query)
     assert "errors" in result
     error_msgs = [error["message"] for error in result["errors"]]
-    assert "User does not exist" in error_msgs
+    assert ResourceNotFound.get_message("User") in error_msgs
 
 
 @pytest.mark.api
@@ -52,4 +54,4 @@ def test_login_incorrect_password(test_client, graphql_endpoint):
     result = post_graphql(test_client, graphql_endpoint, query)
     assert "errors" in result
     error_msgs = [error["message"] for error in result["errors"]]
-    assert "Invalid password" in error_msgs
+    assert INVALID_PASSWORD in error_msgs

@@ -21,9 +21,9 @@ from app.gql.types import (
 )
 
 from strawberry.types import Info
-
 from sqlalchemy import String, ForeignKey, UniqueConstraint
 from typing import List, Tuple, Union, Dict, Optional
+from graphql import GraphQLError
 
 SQL_CLASS_NAME_TO_CLASS = {"Employer"}
 
@@ -92,7 +92,7 @@ class Base(DeclarativeBase):
         gql_class = globals().get(gql_class_name)
 
         if not gql_class:
-            raise ValueError(f"Strawberry type {gql_class_name} not found.")
+            raise GraphQLError(f"Strawberry type {gql_class_name} not found.")
 
         # TODO: Need to improve password handling.
         gql_class_init_args = {

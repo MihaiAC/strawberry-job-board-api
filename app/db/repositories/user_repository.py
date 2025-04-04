@@ -3,7 +3,7 @@ from app.db.models import User as User_sql
 from typing import Optional
 from fastapi import Request
 from app.auth_utils import get_user_email_from_request_token
-from graphql import GraphQLError
+from app.errors.custom_errors import ResourceNotFound
 
 
 class UserRepository:
@@ -20,6 +20,6 @@ class UserRepository:
         )
 
         if request_user is None:
-            raise GraphQLError("Authenticated user not found.")
+            raise ResourceNotFound("Authenticated user")
 
         return request_user

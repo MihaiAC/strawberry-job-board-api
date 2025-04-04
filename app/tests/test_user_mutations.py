@@ -4,6 +4,12 @@ from .utils import post_graphql
 from freezegun import freeze_time
 from app.settings.config import JWT_EXPIRATION_TIME_MINUTES
 from datetime import datetime, timezone, timedelta
+from app.errors.error_messages import (
+    USER_ALREADY_EXISTS,
+    INVALID_AUTHORIZATION_HEADER,
+    INSUFFICIENT_PRIVILEGES,
+    EXPIRED_TOKEN,
+)
 
 
 def assert_no_new_user_added(test_client, graphql_endpoint):
@@ -82,7 +88,7 @@ def test_add_existing_user_unauth(test_client, graphql_endpoint):
     """
     result = post_graphql(test_client, graphql_endpoint, query)
     assert "errors" in result
-    assert result["errors"][0]["message"] == "A user with that email already exists."
+    assert result["errors"][0]["message"] == USER_ALREADY_EXISTS
 
     assert_no_new_user_added(test_client, graphql_endpoint)
 
@@ -112,7 +118,7 @@ def test_add_new_admin_unauth(test_client, graphql_endpoint):
     """
     result = post_graphql(test_client, graphql_endpoint, query)
     assert "errors" in result
-    assert result["errors"][0]["message"] == "Authorization header missing or invalid."
+    assert result["errors"][0]["message"] == INVALID_AUTHORIZATION_HEADER
 
     assert_no_new_user_added(test_client, graphql_endpoint)
 
@@ -181,7 +187,7 @@ def test_add_new_admin_auth_as_user(test_client, graphql_endpoint, user_header):
         headers=user_header,
     )
     assert "errors" in result
-    assert result["errors"][0]["message"] == "Only admin users can add new admin users."
+    assert result["errors"][0]["message"] == INSUFFICIENT_PRIVILEGES
     assert_no_new_user_added(test_client, graphql_endpoint)
 
 
@@ -259,5 +265,5 @@ def test_add_new_admin_auth_as_admin_token_expired(
         )
 
     assert "errors" in result
-    assert result["errors"][0]["message"] == "Token has expired."
+    assert result["errors"][0]["message"] == EXPIRED_TOKEN
     assert_no_new_user_added(test_client, graphql_endpoint)

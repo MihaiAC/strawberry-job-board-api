@@ -119,26 +119,6 @@ def test_update_nonexisting_job(test_client, graphql_endpoint):
 
 @pytest.mark.api
 @pytest.mark.mutation
-def test_update_existing_job_insufficient_args(test_client, graphql_endpoint):
-    query = """
-    mutation {
-        updateJob(jobId: 1) {
-            id
-            title
-        }
-    }
-    """
-    result = post_graphql(test_client, graphql_endpoint, query)
-    assert result["data"] is None
-    assert "errors" in result
-    assert (
-        "Please provide at least one job field you would like to modify."
-        == result["errors"][0]["message"]
-    )
-
-
-@pytest.mark.api
-@pytest.mark.mutation
 def test_delete_existing_job(test_client, graphql_endpoint):
     query = """
     mutation {

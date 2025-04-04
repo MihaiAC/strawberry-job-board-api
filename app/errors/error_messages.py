@@ -1,0 +1,6 @@
+EXPIRED_TOKEN = "Token has expired."
+INVALID_AUTHORIZATION_HEADER = "Authorization header missing or invalid."
+INVALID_PASSWORD = "Invalid password."
+INVALID_TOKEN = "Token is invalid."
+USER_ALREADY_EXISTS = "A user with that email already exists."
+INSUFFICIENT_PRIVILEGES = "You do not have permission to perform this action."

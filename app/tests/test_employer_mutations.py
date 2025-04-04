@@ -65,26 +65,6 @@ def test_update_nonexisting_employer(test_client, graphql_endpoint):
 
 @pytest.mark.api
 @pytest.mark.mutation
-def test_update_existing_employer_insufficient_args(test_client, graphql_endpoint):
-    query = """
-    mutation {
-        updateEmployer(employerId: 1) {
-            id
-            name
-        }
-    }
-    """
-    result = post_graphql(test_client, graphql_endpoint, query)
-    assert result["data"] is None
-    assert "errors" in result
-    assert (
-        "Please provide at least one employer field you would like to modify."
-        == result["errors"][0]["message"]
-    )
-
-
-@pytest.mark.api
-@pytest.mark.mutation
 def test_delete_existing_employer(test_client, graphql_endpoint):
     query = """
     mutation {

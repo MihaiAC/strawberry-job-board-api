@@ -8,6 +8,11 @@ from app.auth_utils import (
     hash_password,
 )
 from app.db.repositories.user_repository import UserRepository
+from app.errors.custom_errors import ResourceNotFound
+from app.errors.error_messages import (
+    USER_ALREADY_EXISTS,
+    INSUFFICIENT_PRIVILEGES,
+)
 
 
 @strawberry.type
@@ -21,7 +26,7 @@ class LoginMutation:
         user_sql = UserRepository.get_user_by_email(db_session, email)
 
         if not user_sql:
-            raise GraphQLError("User does not exist")
+            raise ResourceNotFound("User")
 
         verify_password(user_sql.password_hash, password)
         token = generate_jwt_token(email)
@@ -44,12 +49,12 @@ class UserMutation:
             )
 
             if authenticated_user.role != "admin":
-                raise GraphQLError("Only admin users can add new admin users.")
+                raise GraphQLError(INSUFFICIENT_PRIVILEGES)
 
         user = UserRepository.get_user_by_email(db_session, email)
 
         if user:
-            raise GraphQLError("A user with that email already exists.")
+            raise GraphQLError(USER_ALREADY_EXISTS)
 
         password_hash = hash_password(password)
         user = User_sql(

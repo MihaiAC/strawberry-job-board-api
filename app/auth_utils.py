@@ -6,6 +6,12 @@ from graphql import GraphQLError
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 from fastapi import Request
+from app.errors.error_messages import (
+    INVALID_PASSWORD,
+    EXPIRED_TOKEN,
+    INVALID_TOKEN,
+    INVALID_AUTHORIZATION_HEADER,
+)
 
 
 def generate_jwt_token(email: str) -> str:
@@ -33,7 +39,7 @@ def verify_password(stored_hash: str, input_password: str) -> bool:
         hasher.verify(stored_hash, input_password)
         return True
     except VerifyMismatchError:
-        raise GraphQLError("Invalid password")
+        raise GraphQLError(INVALID_PASSWORD)
 
 
 def extract_token_from_request(request: Request) -> str:
@@ -48,7 +54,7 @@ def extract_token_from_request(request: Request) -> str:
     """
     auth_header = request.headers.get("Authorization")
     if auth_header is None or not auth_header.startswith("Bearer "):
-        raise GraphQLError("Authorization header missing or invalid.")
+        raise GraphQLError(INVALID_AUTHORIZATION_HEADER)
     jwt_token = auth_header[7:]
     return jwt_token
 
@@ -66,10 +72,10 @@ def decode_jwt_token_return_email(jwt_token: str) -> str:
         if datetime.now(timezone.utc) > datetime.fromtimestamp(
             payload["expiration_time"], tz=timezone.utc
         ):
-            raise GraphQLError("Token has expired.")
+            raise GraphQLError(EXPIRED_TOKEN)
         return payload["email"]
     except InvalidSignatureError:
-        raise GraphQLError("Invalid authentication token.")
+        raise GraphQLError(INVALID_TOKEN)
 
 
 def get_user_email_from_request_token(request: Request) -> str:
