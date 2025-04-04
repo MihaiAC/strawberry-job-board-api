@@ -22,8 +22,9 @@ from app.gql.types import (
 
 from strawberry.types import Info
 from sqlalchemy import String, ForeignKey, UniqueConstraint
-from typing import List, Tuple, Union, Dict, Optional
+from typing import List, Tuple, Union, Dict, Optional, Self
 from graphql import GraphQLError
+from deprecated import deprecated
 
 SQL_CLASS_NAME_TO_CLASS = {"Employer"}
 
@@ -57,6 +58,37 @@ class Base(DeclarativeBase):
                 additional_args[field_name] = True
         return query, additional_args
 
+    @classmethod
+    def get_all(cls: Self, db_session: Session, selected_fields: str) -> List[Self]:
+        query = db_session.query(cls)
+        query, _ = cls.apply_joins(query, selected_fields)
+        return query.all()
+
+    @classmethod
+    def get_all_gql(cls, db_session: Session, selected_fields: str) -> List[Base_gql]:
+        query = db_session.query(cls)
+        query, FKs_to_convert = cls.apply_joins(query, selected_fields)
+        all_objs = query.all()
+        return [obj.to_gql(**FKs_to_convert) for obj in all_objs]
+
+    @classmethod
+    def get_by_id(cls: Self, db_session: Session, selected_fields: str) -> Self:
+        query = db_session.query(cls)
+        query, _ = cls.apply_joins(query, selected_fields)
+        query = query.filter_by(id=id)
+        obj = query.first()
+        return obj
+
+    @classmethod
+    def get_by_id_gql(cls: Self, db_session: Session, selected_fields: str) -> Self:
+        query = db_session.query(cls)
+        query, FKs_to_convert = cls.apply_joins(query, selected_fields)
+        query = query.filter_by(id=id)
+        obj = query.first()
+        return obj.to_gql(**FKs_to_convert)
+
+    # TODO: Remove when completely replaced.
+    @deprecated
     @classmethod
     def fetch_and_transform_to_gql(
         cls, info: Info, id: int = None, **kwargs
