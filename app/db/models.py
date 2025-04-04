@@ -72,18 +72,30 @@ class Base(DeclarativeBase):
         return [obj.to_gql(**FKs_to_convert) for obj in all_objs]
 
     @classmethod
-    def get_by_id(cls: Self, db_session: Session, selected_fields: str) -> Self:
+    def get_by_attr(
+        cls: Self,
+        db_session: Session,
+        selected_fields: str,
+        attr_name: str,
+        attr_value: any,
+    ) -> Self:
         query = db_session.query(cls)
         query, _ = cls.apply_joins(query, selected_fields)
-        query = query.filter_by(id=id)
+        query = query.filter(getattr(cls, attr_name) == attr_value)
         obj = query.first()
         return obj
 
     @classmethod
-    def get_by_id_gql(cls: Self, db_session: Session, selected_fields: str) -> Self:
+    def get_by_attr_gql(
+        cls: Self,
+        db_session: Session,
+        selected_fields: str,
+        attr_name: str,
+        attr_value: any,
+    ) -> Self:
         query = db_session.query(cls)
         query, FKs_to_convert = cls.apply_joins(query, selected_fields)
-        query = query.filter_by(id=id)
+        query = query.filter(getattr(cls, attr_name) == attr_value)
         obj = query.first()
         return obj.to_gql(**FKs_to_convert)
 
