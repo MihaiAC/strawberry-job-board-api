@@ -59,17 +59,16 @@ class Base(DeclarativeBase):
         return query, additional_args
 
     @classmethod
-    def get_all(cls: Self, db_session: Session, selected_fields: str) -> List[Self]:
-        query = db_session.query(cls)
-        query, _ = cls.apply_joins(query, selected_fields)
-        return query.all()
-
-    @classmethod
-    def get_all_gql(cls, db_session: Session, selected_fields: str) -> List[Base_gql]:
+    def get_all(
+        cls: Self, db_session: Session, selected_fields: str, gql: bool = True
+    ) -> List[Self]:
         query = db_session.query(cls)
         query, FKs_to_convert = cls.apply_joins(query, selected_fields)
         all_objs = query.all()
-        return [obj.to_gql(**FKs_to_convert) for obj in all_objs]
+        if gql:
+            return [obj.to_gql(**FKs_to_convert) for obj in all_objs]
+        else:
+            return all_objs
 
     @classmethod
     def get_by_attr(
@@ -78,26 +77,17 @@ class Base(DeclarativeBase):
         selected_fields: str,
         attr_name: str,
         attr_value: any,
+        gql: bool = True,
     ) -> List[Self]:
-        query = db_session.query(cls)
-        query, _ = cls.apply_joins(query, selected_fields)
-        query = query.filter(getattr(cls, attr_name) == attr_value)
-        obj = query.all()
-        return obj
-
-    @classmethod
-    def get_by_attr_gql(
-        cls: Self,
-        db_session: Session,
-        selected_fields: str,
-        attr_name: str,
-        attr_value: any,
-    ) -> List[Base_gql]:
         query = db_session.query(cls)
         query, FKs_to_convert = cls.apply_joins(query, selected_fields)
         query = query.filter(getattr(cls, attr_name) == attr_value)
         filtered_objs = query.all()
-        return [obj.to_gql(**FKs_to_convert) for obj in filtered_objs]
+
+        if gql:
+            return [obj.to_gql(**FKs_to_convert) for obj in filtered_objs]
+        else:
+            return filtered_objs
 
     # TODO: Remove when completely replaced.
     @deprecated
