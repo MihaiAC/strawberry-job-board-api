@@ -17,9 +17,10 @@ from sqlalchemy.orm import Session
 # TODO: How can you limit the number of queries a user can perform in a
 # given time window?
 # TODO: Should use strawberry input types.
-# TODO: Centralise error messages in a constants file.
+# TODO: Centralise error messages in a constants file + custom errors.
 # TODO: .env usage is confusing - DB variables are ignored in tests, the
 # others are not.
+# TODO: Dockerize both the app and the testing.
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     prepare_database()

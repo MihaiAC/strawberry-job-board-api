@@ -6,7 +6,6 @@ from app.auth_utils import (
     verify_password,
     generate_jwt_token,
     hash_password,
-    get_user_email_from_request_token,
 )
 from app.db.repositories.user_repository import UserRepository
 
@@ -40,13 +39,11 @@ class UserMutation:
         # Only an admin can add another admin.
         if role == "admin":
             request = info.context["request"]
-            request_user_email = get_user_email_from_request_token(request)
-            request_user = UserRepository.get_user_by_email(
-                db_session,
-                request_user_email,
+            authenticated_user = UserRepository.get_authenticated_user(
+                db_session, request
             )
 
-            if request_user.role != "admin":
+            if authenticated_user.role != "admin":
                 raise GraphQLError("Only admin users can add new admin users.")
 
         user = UserRepository.get_user_by_email(db_session, email)
