@@ -20,6 +20,7 @@ from app.auth.roles import Role
 @strawberry.type
 class LoginMutation:
     @strawberry.mutation
+    @require_role([Role.UNAUTHENTICATED])
     def login_user(email: str, password: str, info: Info) -> str:
         # TODO: Should use .get and handle errors explicitly.
         db_session = info.context["db_session"]

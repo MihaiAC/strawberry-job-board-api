@@ -7,6 +7,7 @@ from .utils import BaseQueries, post_graphql
     "query, permissions",
     [
         (BaseQueries.APPLICATIONS, [False, True, True]),
+        (BaseQueries.LOGIN, [True, False, False]),
     ],
 )
 def test_permissions(
@@ -19,4 +20,6 @@ def test_permissions(
         result = post_graphql(test_client, graphql_endpoint, query, headers=header)
         has_permission = permissions[idx]
         query_was_successful = "errors" not in result
-        assert has_permission == query_was_successful
+        assert (
+            has_permission == query_was_successful
+        ), f"{idx} {has_permission} {query_was_successful}"

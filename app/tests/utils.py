@@ -68,10 +68,16 @@ def get_test_first_non_admin_email() -> str:
     return user["email"]
 
 
+def get_test_first_non_admin_password() -> str:
+    _, user = get_test_first_non_admin_user()
+    return user["password"]
+
+
 def get_test_first_non_admin_id() -> str:
     idx, _ = get_test_first_non_admin_user()
     return idx + 1
 
 
 class BaseQueries:
-    APPLICATIONS = "query { applications { id } }"
+    APPLICATIONS = """query { applications { id } }"""
+    LOGIN = f"""mutation {{ loginUser (email: "{get_test_first_non_admin_email()}", password: "{get_test_first_non_admin_password()}")}}"""
