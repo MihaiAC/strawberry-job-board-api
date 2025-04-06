@@ -10,6 +10,7 @@ from app.db.models import (
 from copy import deepcopy
 from app.auth.auth_utils import hash_password
 from typing import Tuple
+from enum import Enum
 
 
 def post_graphql(
@@ -78,7 +79,7 @@ def get_test_first_non_admin_id() -> str:
     return idx + 1
 
 
-class BaseQueries:
+class BaseQueries(str, Enum):
     APPLICATIONS = """query { applications { id } }"""
     LOGIN = f"""mutation {{ loginUser (email: "{get_test_first_non_admin_email()}", password: "{get_test_first_non_admin_password()}")}}"""
     ADD_EMPLOYER = """mutation {
@@ -99,3 +100,22 @@ class BaseQueries:
     }
     """
     DELETE_EMPLOYER = """mutation {deleteEmployer(employerId: 1)}"""
+    ADD_JOB = """
+    mutation {
+        addJob(title: "X title", description: "X descr", employerId: 1) {
+            id
+            title
+            description
+            employerId
+        }
+    }
+    """
+    UPDATE_JOB = """
+    mutation {
+        updateJob(jobId: 1, title: "new title") {
+            id
+            title
+        }
+    }
+    """
+    DELETE_JOB = """mutation {deleteJob(jobId: 1)}"""

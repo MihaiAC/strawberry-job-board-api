@@ -11,6 +11,9 @@ from .utils import BaseQueries, post_graphql
         (BaseQueries.UPDATE_EMPLOYER, [False, False, True]),
         (BaseQueries.ADD_EMPLOYER, [False, False, True]),
         (BaseQueries.DELETE_EMPLOYER, [False, False, True]),
+        (BaseQueries.ADD_JOB, [False, False, True]),
+        (BaseQueries.UPDATE_JOB, [False, False, True]),
+        (BaseQueries.DELETE_JOB, [False, False, True]),
     ],
 )
 def test_permissions(

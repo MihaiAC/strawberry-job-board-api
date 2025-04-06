@@ -3,12 +3,15 @@ from strawberry.types import Info
 from app.db.models import Job_gql, Job as Job_sql
 from typing import Optional
 from app.errors.custom_errors import ResourceNotFound
+from app.auth.roles import Role
+from app.auth.auth_utils import require_role
 
 
 @strawberry.type
 class JobMutation:
 
     @strawberry.mutation
+    @require_role([Role.ADMIN])
     def add_job(
         self,
         title: str,
@@ -25,6 +28,7 @@ class JobMutation:
         return job_sql.to_gql()
 
     @strawberry.mutation
+    @require_role([Role.ADMIN])
     def update_job(
         self,
         job_id: int,
@@ -58,6 +62,7 @@ class JobMutation:
         return job_sql.to_gql()
 
     @strawberry.mutation
+    @require_role([Role.ADMIN])
     def delete_job(
         self,
         job_id: int,

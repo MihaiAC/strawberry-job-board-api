@@ -6,7 +6,11 @@ from app.db.repositories.application_repository import ApplicationRepository
 
 @pytest.mark.api
 @pytest.mark.mutation
-def test_add_job(test_client, graphql_endpoint):
+def test_add_job(
+    test_client,
+    graphql_endpoint,
+    admin_header,
+):
     query = """
     mutation {
         addJob(title: "X title", description: "X descr", employerId: 1) {
@@ -17,7 +21,7 @@ def test_add_job(test_client, graphql_endpoint):
         }
     }
     """
-    result = post_graphql(test_client, graphql_endpoint, query)
+    result = post_graphql(test_client, graphql_endpoint, query, headers=admin_header)
 
     job = result["data"]["addJob"]
     assert job["id"] == len(JOBS_DATA) + 1
@@ -40,7 +44,11 @@ def test_add_job(test_client, graphql_endpoint):
 
 @pytest.mark.api
 @pytest.mark.mutation
-def test_successfully_update_existing_job_title(test_client, graphql_endpoint):
+def test_successfully_update_existing_job_title(
+    test_client,
+    graphql_endpoint,
+    admin_header,
+):
     updated_title = "Improved job title"
     query = f"""
     mutation {{
@@ -50,7 +58,7 @@ def test_successfully_update_existing_job_title(test_client, graphql_endpoint):
         }}
     }}
     """
-    result = post_graphql(test_client, graphql_endpoint, query)
+    result = post_graphql(test_client, graphql_endpoint, query, headers=admin_header)
     job = result["data"]["updateJob"]
     assert job["id"] == 1
     assert job["title"] == updated_title
@@ -58,7 +66,11 @@ def test_successfully_update_existing_job_title(test_client, graphql_endpoint):
 
 @pytest.mark.api
 @pytest.mark.mutation
-def test_successfully_update_existing_job_employer(test_client, graphql_endpoint):
+def test_successfully_update_existing_job_employer(
+    test_client,
+    graphql_endpoint,
+    admin_header,
+):
     updated_employer_id = 2
     query = f"""
     mutation {{
@@ -68,7 +80,7 @@ def test_successfully_update_existing_job_employer(test_client, graphql_endpoint
         }}
     }}
     """
-    result = post_graphql(test_client, graphql_endpoint, query)
+    result = post_graphql(test_client, graphql_endpoint, query, headers=admin_header)
     job = result["data"]["updateJob"]
     assert job["id"] == 1
 
@@ -102,7 +114,11 @@ def test_successfully_update_existing_job_employer(test_client, graphql_endpoint
 
 @pytest.mark.api
 @pytest.mark.mutation
-def test_update_nonexisting_job(test_client, graphql_endpoint):
+def test_update_nonexisting_job(
+    test_client,
+    graphql_endpoint,
+    admin_header,
+):
     updated_title = "Improved job title"
     query = f"""
     mutation {{
@@ -112,7 +128,7 @@ def test_update_nonexisting_job(test_client, graphql_endpoint):
         }}
     }}
     """
-    result = post_graphql(test_client, graphql_endpoint, query)
+    result = post_graphql(test_client, graphql_endpoint, query, headers=admin_header)
     assert result["data"] is None
     assert "errors" in result
     assert "not found" in result["errors"][0]["message"]
@@ -120,14 +136,19 @@ def test_update_nonexisting_job(test_client, graphql_endpoint):
 
 @pytest.mark.api
 @pytest.mark.mutation
-def test_delete_existing_job(test_client, db_session, graphql_endpoint):
+def test_delete_existing_job(
+    test_client,
+    db_session,
+    graphql_endpoint,
+    admin_header,
+):
     job_id = 1
     query = f"""
     mutation {{
         deleteJob(jobId: {job_id})
     }}
     """
-    result = post_graphql(test_client, graphql_endpoint, query)
+    result = post_graphql(test_client, graphql_endpoint, query, headers=admin_header)
     assert result["data"]["deleteJob"]
 
     # Check that the job has actually been deleted.
