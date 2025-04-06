@@ -81,3 +81,21 @@ def get_test_first_non_admin_id() -> str:
 class BaseQueries:
     APPLICATIONS = """query { applications { id } }"""
     LOGIN = f"""mutation {{ loginUser (email: "{get_test_first_non_admin_email()}", password: "{get_test_first_non_admin_password()}")}}"""
+    ADD_EMPLOYER = """mutation {
+        addEmployer(name: "X", industry: "Y" contactEmail: "ZZZ@AAA.com") {
+            id
+            name
+            industry
+            contactEmail
+        }
+    }
+    """
+    UPDATE_EMPLOYER = """
+    mutation {
+        updateEmployer(employerId: 1, name: "updated_name") {
+            id
+            name
+        }
+    }
+    """
+    DELETE_EMPLOYER = """mutation {deleteEmployer(employerId: 1)}"""

@@ -8,7 +8,11 @@ from app.db.repositories.application_repository import ApplicationRepository
 
 @pytest.mark.api
 @pytest.mark.mutation
-def test_add_employer_complete_info(test_client, graphql_endpoint):
+def test_add_employer_complete_info(
+    test_client,
+    graphql_endpoint,
+    admin_header,
+):
     employer_name = "X name"
     employer_industry = "YZ industry"
     employer_email = "XYZ@example.com"
@@ -22,7 +26,7 @@ def test_add_employer_complete_info(test_client, graphql_endpoint):
         }}
     }}
     """
-    result = post_graphql(test_client, graphql_endpoint, query)
+    result = post_graphql(test_client, graphql_endpoint, query, headers=admin_header)
     employer = result["data"]["addEmployer"]
     assert employer["id"] == len(EMPLOYERS_DATA) + 1
     assert employer["name"] == employer_name
@@ -32,7 +36,11 @@ def test_add_employer_complete_info(test_client, graphql_endpoint):
 
 @pytest.mark.api
 @pytest.mark.mutation
-def test_successfully_update_existing_employer_name(test_client, graphql_endpoint):
+def test_successfully_update_existing_employer_name(
+    test_client,
+    graphql_endpoint,
+    admin_header,
+):
     updated_name = "Updatio Updatius"
     query = f"""
     mutation {{
@@ -42,7 +50,7 @@ def test_successfully_update_existing_employer_name(test_client, graphql_endpoin
         }}
     }}
     """
-    result = post_graphql(test_client, graphql_endpoint, query)
+    result = post_graphql(test_client, graphql_endpoint, query, headers=admin_header)
     employer = result["data"]["updateEmployer"]
     assert employer["id"] == 1
     assert employer["name"] == updated_name
@@ -50,7 +58,11 @@ def test_successfully_update_existing_employer_name(test_client, graphql_endpoin
 
 @pytest.mark.api
 @pytest.mark.mutation
-def test_update_nonexisting_employer(test_client, graphql_endpoint):
+def test_update_nonexisting_employer(
+    test_client,
+    graphql_endpoint,
+    admin_header,
+):
     updated_name = "Updatio Updatius"
     query = f"""
     mutation {{
@@ -60,7 +72,7 @@ def test_update_nonexisting_employer(test_client, graphql_endpoint):
         }}
     }}
     """
-    result = post_graphql(test_client, graphql_endpoint, query)
+    result = post_graphql(test_client, graphql_endpoint, query, headers=admin_header)
     assert result["data"] is None
     assert "errors" in result
     assert "not found" in result["errors"][0]["message"]
@@ -68,14 +80,19 @@ def test_update_nonexisting_employer(test_client, graphql_endpoint):
 
 @pytest.mark.api
 @pytest.mark.mutation
-def test_delete_existing_employer(test_client, graphql_endpoint, db_session):
+def test_delete_existing_employer(
+    test_client,
+    graphql_endpoint,
+    db_session,
+    admin_header,
+):
     employer_id = 1
     query = f"""
     mutation {{
         deleteEmployer(employerId: {employer_id})
     }}
     """
-    result = post_graphql(test_client, graphql_endpoint, query)
+    result = post_graphql(test_client, graphql_endpoint, query, headers=admin_header)
     assert result["data"]["deleteEmployer"]
 
     # Check that the employer has actually been deleted.
@@ -109,7 +126,11 @@ def test_delete_existing_employer(test_client, graphql_endpoint, db_session):
 
 @pytest.mark.api
 @pytest.mark.mutation
-def test_add_jobs_to_new_employer(test_client, graphql_endpoint):
+def test_add_jobs_to_new_employer(
+    test_client,
+    graphql_endpoint,
+    admin_header,
+):
     employer_name = "X name"
     employer_industry = "YZ industry"
     employer_email = "XYZ@example.com"
@@ -124,7 +145,7 @@ def test_add_jobs_to_new_employer(test_client, graphql_endpoint):
         }}
     }}
     """
-    result = post_graphql(test_client, graphql_endpoint, query)
+    result = post_graphql(test_client, graphql_endpoint, query, headers=admin_header)
     employer = result["data"]["addEmployer"]
     assert employer["id"] == new_employer_id
 
@@ -136,7 +157,7 @@ def test_add_jobs_to_new_employer(test_client, graphql_endpoint):
         }}
     }}
     """
-    result = post_graphql(test_client, graphql_endpoint, query)
+    result = post_graphql(test_client, graphql_endpoint, query, headers=admin_header)
     job = result["data"]["addJob"]
     assert job["id"] == len(JOBS_DATA) + 1
 
@@ -148,7 +169,7 @@ def test_add_jobs_to_new_employer(test_client, graphql_endpoint):
         }}
     }}
     """
-    result = post_graphql(test_client, graphql_endpoint, query)
+    result = post_graphql(test_client, graphql_endpoint, query, headers=admin_header)
     job = result["data"]["updateJob"]
     assert job["id"] == 1
 
@@ -162,7 +183,7 @@ def test_add_jobs_to_new_employer(test_client, graphql_endpoint):
         }}
     }}
     """
-    result = post_graphql(test_client, graphql_endpoint, query)
+    result = post_graphql(test_client, graphql_endpoint, query, headers=admin_header)
     jobs = result["data"]["employer"]["jobs"]
     assert len(jobs) == 2
     assert sorted([job["id"] for job in jobs]) == [1, len(JOBS_DATA) + 1]

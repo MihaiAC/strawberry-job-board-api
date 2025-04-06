@@ -3,12 +3,15 @@ from strawberry.types import Info
 from app.db.models import Employer as Employer_sql, Employer_gql
 from typing import Optional
 from app.errors.custom_errors import ResourceNotFound
+from app.auth.roles import Role
+from app.auth.auth_utils import require_role
 
 
 @strawberry.type
 class EmployerMutation:
-
+    # TODO: Should check that employer email doesn't already exist.
     @strawberry.mutation
+    @require_role([Role.ADMIN])
     def add_employer(
         self,
         name: str,
@@ -27,6 +30,7 @@ class EmployerMutation:
         return employer_sql.to_gql()
 
     @strawberry.mutation
+    @require_role([Role.ADMIN])
     def update_employer(
         self,
         employer_id: int,
@@ -64,6 +68,7 @@ class EmployerMutation:
         return employer_sql.to_gql()
 
     @strawberry.mutation
+    @require_role([Role.ADMIN])
     def delete_employer(
         self,
         employer_id: int,
