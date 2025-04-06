@@ -24,17 +24,129 @@ def test_get_all_jobs(test_client, graphql_endpoint):
 
 @pytest.mark.api
 @pytest.mark.query
-def test_get_job_by_id(test_client, graphql_endpoint):
+@pytest.mark.auth
+def test_get_job_by_id_all_roles(
+    test_client, graphql_endpoint, admin_header, user_header
+):
+    for job_id in range(1, len(JOBS_DATA) + 1):
+        query = f"""
+            query {{
+            job(id: {job_id}) {{
+                id
+                employerId
+                title
+                employer {{
+                    name
+                }}
+                applications {{
+                    jobId
+                    userId
+                }}
+            }}
+        }}
+        """
+        for headers in ["", user_header, admin_header]:
+            result = post_graphql(test_client, graphql_endpoint, query, headers=headers)
+            job = result["data"]["job"]
+            assert job["title"] == JOBS_DATA[0]["title"]
+            assert job["applications"] is None
+            assert (
+                EMPLOYERS_DATA[job["employerId"] - 1]["name"] == job["employer"]["name"]
+            )
+
+
+@pytest.mark.api
+@pytest.mark.query
+@pytest.mark.auth
+def test_get_all_jobs_admin(test_client, graphql_endpoint, admin_header):
+    """Tests admin can get all the jobs and respective applications."""
     query = """
         query {
-        job(id: 1) {
-            title
+            jobs {
+                id
+                title
+                employer {
+                    name
+                }
+                applications {
+                    jobId
+                    userId
+                }
+            }
         }
-    }
+    """
+    result = post_graphql(test_client, graphql_endpoint, query, headers=admin_header)
+    jobs = result["data"]["jobs"]
+    assert len(jobs) == len(JOBS_DATA)
+
+    unique_apps = set()
+    for job in jobs:
+        for application in job["applications"]:
+            assert {
+                "user_id": application["userId"],
+                "job_id": application["jobId"],
+            } in APPLICATIONS_DATA
+            unique_apps.add((application["userId"], application["jobId"]))
+
+    assert len(unique_apps) == len(APPLICATIONS_DATA)
+
+
+@pytest.mark.api
+@pytest.mark.query
+@pytest.mark.auth
+def test_get_all_jobs_user(test_client, graphql_endpoint, user_header):
+    """Tests user only gets his applications."""
+    query = """
+        query {
+            jobs {
+                id
+                title
+                employer {
+                    name
+                }
+                applications {
+                    jobId
+                    userId
+                }
+            }
+        }
+    """
+    result = post_graphql(test_client, graphql_endpoint, query, headers=user_header)
+    jobs = result["data"]["jobs"]
+    assert len(jobs) == len(JOBS_DATA)
+
+    for job in jobs:
+        if len(job["applications"]) > 0:
+            for application in job["applications"]:
+                assert application["userId"] == get_test_first_non_admin_id()
+
+
+@pytest.mark.api
+@pytest.mark.query
+@pytest.mark.auth
+def test_get_all_jobs_unauth(test_client, graphql_endpoint):
+    """Tests user only gets his applications."""
+    query = """
+        query {
+            jobs {
+                id
+                title
+                employer {
+                    name
+                }
+                applications {
+                    jobId
+                    userId
+                }
+            }
+        }
     """
     result = post_graphql(test_client, graphql_endpoint, query)
-    job = result["data"]["job"]
-    assert job["title"] == JOBS_DATA[0]["title"]
+    jobs = result["data"]["jobs"]
+    assert len(jobs) == len(JOBS_DATA)
+
+    for job in jobs:
+        assert job["applications"] is None or len(job["applications"]) == 0
 
 
 @pytest.mark.api

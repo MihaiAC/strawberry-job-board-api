@@ -19,6 +19,8 @@ user -> applications -> jobs -> employer aka for a given user, get all the emplo
 
 This query parsing is complicated by the fact that you have to somehow map every Strawberry type's relevant fields to their corresponding SQL class (e.g: job -> Job, jobs -> Job, applications -> Application and so on...) and also you'd have to call the appropriate "joinedload" afterwards (again, converting to the appropriate SQLAlchemy class field from a string you extract from info.selected_fields). The solution I came up with was extremely flaky and would break on any field/class rename and would have also been annoying to test.
 
+What if you add an auth model on top of this?
+
 I also found **[strawberry-sqlalchemy](https://github.com/strawberry-graphql/strawberry-sqlalchemy)**, but it doesn't seem to offer the freedom you need.
 
 Since this is a toy example I'll just limit the query depth to 1 and use "joinedload" naively.

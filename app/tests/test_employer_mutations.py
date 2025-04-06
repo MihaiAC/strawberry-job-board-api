@@ -105,7 +105,7 @@ def test_delete_existing_employer(
     assert employer is None
 
     # Check that the jobs belonging to the employer have been deleted.
-    jobs = JobRepository.get_all_jobs(
+    jobs = JobRepository.get_all_jobs_admin(
         db_session=db_session,
         selected_fields="",
         gql=False,

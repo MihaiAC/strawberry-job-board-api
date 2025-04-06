@@ -10,6 +10,7 @@ from sqlalchemy.orm import (
     Query,
     joinedload,
     Session,
+    contains_eager,
 )
 
 from app.gql.types import (
@@ -44,7 +45,11 @@ class Base(DeclarativeBase):
 
     @classmethod
     def apply_joins(
-        cls, query: Query, selected_fields: str
+        cls,
+        query: Query,
+        selected_fields: str,
+        ignore_fields: List[str],
+        **kwargs,
     ) -> Tuple[Query, Dict[str, bool]]:
         """
         Naively decides what joinedloads to do.
@@ -53,17 +58,27 @@ class Base(DeclarativeBase):
         """
         additional_args = {}
         for field_name in cls.get_fk_field_names():
-            if field_name in selected_fields:
+            if field_name in selected_fields and field_name not in ignore_fields:
                 query = query.options(joinedload(getattr(cls, field_name)))
                 additional_args[field_name] = True
         return query, additional_args
 
+    # TODO: Merge get_all and get_by_attr (redundant, just add argument).
+    # TODO: Also add a docstring to it, since it grew large.
+    # TODO: Should repo methods match get functions exactly?
+    # TODO: Move ignore_fields back to applications only and re-name it ignore_applications.
+    # TODO: Rename selected_fields to selected_joins or something more appropriate.
     @classmethod
     def get_all(
-        cls: Self, db_session: Session, selected_fields: str, gql: bool = True
+        cls: Self,
+        db_session: Session,
+        selected_fields: str,
+        gql: bool = True,
+        ignore_fields: List[str] = [],
+        **kwargs,
     ) -> List[Self]:
         query = db_session.query(cls)
-        query, FKs_to_convert = cls.apply_joins(query, selected_fields)
+        query, FKs_to_convert = cls.apply_joins(query, selected_fields, ignore_fields)
         all_objs = query.all()
         if gql:
             return [obj.to_gql(**FKs_to_convert) for obj in all_objs]
@@ -78,9 +93,11 @@ class Base(DeclarativeBase):
         attr_name: str,
         attr_value: any,
         gql: bool = True,
+        ignore_fields: List[str] = [],
+        **kwargs,
     ) -> List[Self]:
         query = db_session.query(cls)
-        query, FKs_to_convert = cls.apply_joins(query, selected_fields)
+        query, FKs_to_convert = cls.apply_joins(query, selected_fields, ignore_fields)
         query = query.filter(getattr(cls, attr_name) == attr_value)
         filtered_objs = query.all()
 
@@ -90,11 +107,14 @@ class Base(DeclarativeBase):
             return filtered_objs
 
     # TODO: Remove when completely replaced.
-
     @classmethod
     @deprecated
     def fetch_and_transform_to_gql(
-        cls, info: Info, id: int = None, **kwargs
+        cls,
+        info: Info,
+        id: int = None,
+        ignore_fields: List[str] = [],
+        **kwargs,
     ) -> Union[Base_gql, List[Base_gql]]:
         db_session = info.context["db_session"]
         query = db_session.query(cls)
@@ -104,7 +124,7 @@ class Base(DeclarativeBase):
         if id:
             query = query.filter_by(id=id)
 
-        query, additional_args = cls.apply_joins(query, selected_fields)
+        query, additional_args = cls.apply_joins(query, selected_fields, ignore_fields)
 
         if id:
             cls_obj = query.first()
@@ -197,6 +217,99 @@ class Job(Base):
             f"description={self.description[:30]!r}..., "
             f"employer_id={self.employer_id!r})"
         )
+
+    @classmethod
+    def get_all(
+        cls: Self,
+        db_session: Session,
+        selected_fields: str,
+        gql: bool = True,
+        ignore_fields: List[str] = [],
+        user_id: int = None,
+        **kwargs,
+    ) -> List[Self]:
+        if user_id is None or "applications" in ignore_fields:
+            return super().get_all(
+                db_session,
+                selected_fields,
+                gql=gql,
+                ignore_fields=ignore_fields,
+                **kwargs,
+            )
+        # If user_id is not None, we must retrieve only the current user's
+        # applications.
+        subquery = (
+            db_session.query(Application)
+            .filter(Application.user_id == user_id)
+            .subquery()
+        )
+
+        query = (
+            db_session.query(cls)
+            .outerjoin(subquery, cls.id == subquery.c.job_id)
+            .options(contains_eager(cls.applications, alias=subquery))
+        )
+
+        # Apply joinedloads.
+        query, FKs_to_convert = cls.apply_joins(
+            query, selected_fields, ["applications"], **kwargs
+        )
+
+        all_objs = query.all()
+        FKs_to_convert["applications"] = True
+
+        if gql:
+            return [obj.to_gql(**FKs_to_convert) for obj in all_objs]
+        else:
+            return all_objs
+
+    @classmethod
+    def get_by_attr(
+        cls: Self,
+        db_session: Session,
+        selected_fields: str,
+        attr_name: str,
+        attr_value: any,
+        gql: bool = True,
+        ignore_fields: List[str] = [],
+        user_id: int = None,
+        **kwargs,
+    ) -> List[Self]:
+        if user_id is None or "applications" in ignore_fields:
+            return super().get_all(
+                db_session,
+                selected_fields,
+                gql=gql,
+                ignore_fields=ignore_fields,
+                **kwargs,
+            )
+
+        # If user_id is not None, we must retrieve only the current user's
+        # applications.
+        subquery = (
+            db_session.query(Application)
+            .filter(Application.user_id == user_id)
+            .subquery()
+        )
+
+        query = (
+            db_session.query(cls)
+            .outerjoin(subquery, cls.id == subquery.c.job_id)
+            .options(contains_eager(cls.applications, alias=subquery))
+        )
+
+        # Apply joinedloads.
+        query, FKs_to_convert = cls.apply_joins(
+            query, selected_fields, ["applications"], **kwargs
+        )
+
+        query = query.filter(getattr(cls, attr_name) == attr_value)
+        FKs_to_convert["applications"] = True
+        all_objs = query.all()
+        if gql:
+            return [obj.to_gql(**FKs_to_convert) for obj in all_objs]
+        else:
+            return all_objs
 
 
 class User(Base):

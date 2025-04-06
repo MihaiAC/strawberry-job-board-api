@@ -110,18 +110,25 @@ def graphql_endpoint():
     return "/graphql"
 
 
+# import json
 @pytest.fixture(scope="session")
 def admin_header() -> str:
     admin_email = get_test_admin_email()
     token = generate_jwt_token(admin_email)
-    return {"Authorization": f"Bearer {token}"}
+    header = {"Authorization": f"Bearer {token}"}
+    # with open("./admin_header.txt", "w") as f:
+    #     f.write(json.dumps(header))
+    return header
 
 
 @pytest.fixture(scope="session")
 def user_header() -> str:
     user_email = get_test_first_non_admin_email()
     token = generate_jwt_token(user_email)
-    return {"Authorization": f"Bearer {token}"}
+    header = {"Authorization": f"Bearer {token}"}
+    # with open("./user_header.txt", "w") as f:
+    #     f.write(json.dumps(header))
+    return header
 
 
 @pytest.fixture(scope="session")
