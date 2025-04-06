@@ -96,13 +96,13 @@ def test_delete_existing_employer(
     assert result["data"]["deleteEmployer"]
 
     # Check that the employer has actually been deleted.
-    employer = EmployerRepository.get_all_employers_by_id(
+    employer = EmployerRepository.get_employer_by_id(
         db_session=db_session,
         selected_fields="",
         id=employer_id,
         gql=False,
     )
-    assert len(employer) == 0
+    assert employer is None
 
     # Check that the jobs belonging to the employer have been deleted.
     jobs = JobRepository.get_all_jobs(
