@@ -1,6 +1,10 @@
 import pytest
 from app.db.data import JOBS_DATA, EMPLOYERS_DATA, USERS_DATA, APPLICATIONS_DATA
-from .utils import post_graphql, get_test_first_non_admin_id
+from .utils import (
+    post_graphql,
+    get_test_first_non_admin_id,
+    get_test_first_non_admin_email,
+)
 from collections import defaultdict
 
 
@@ -260,7 +264,8 @@ def test_circular_reference_depth_limit(test_client, graphql_endpoint):
 
 @pytest.mark.api
 @pytest.mark.query
-def test_get_all_users(test_client, graphql_endpoint):
+@pytest.mark.auth
+def test_get_all_users_as_admin(test_client, graphql_endpoint, admin_header):
     query = """
     query {
         users {
@@ -271,7 +276,7 @@ def test_get_all_users(test_client, graphql_endpoint):
         }
     }
     """
-    result = post_graphql(test_client, graphql_endpoint, query)
+    result = post_graphql(test_client, graphql_endpoint, query, headers=admin_header)
     users = result["data"]["users"]
     assert len(users) == len(USERS_DATA)
     assert sorted([user["username"] for user in users]) == sorted(
@@ -280,6 +285,27 @@ def test_get_all_users(test_client, graphql_endpoint):
     # TODO: Make this into its own test - not even trying to retrieve test.
     for user in users:
         assert "password" not in user and "password_hash" not in user
+
+
+@pytest.mark.api
+@pytest.mark.query
+@pytest.mark.auth
+def test_get_all_users_as_user(test_client, graphql_endpoint, user_header):
+    query = """
+    query {
+        users {
+            id
+            email
+            username
+            role
+        }
+    }
+    """
+    result = post_graphql(test_client, graphql_endpoint, query, headers=user_header)
+    users = result["data"]["users"]
+    assert len(users) == 1
+    assert users["id"] == get_test_first_non_admin_id()
+    assert users["email"] == get_test_first_non_admin_email()
 
 
 @pytest.mark.api

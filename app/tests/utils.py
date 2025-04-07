@@ -121,3 +121,13 @@ class BaseQueries(str, Enum):
     DELETE_JOB = """mutation {deleteJob(jobId: 1)}"""
     QUERY_JOB_BY_ID = """query {job(id: 1) {title}}"""
     QUERY_ALL_JOBS = """query {jobs {title}}"""
+    QUERY_ALL_USERS = """
+    query {
+        users {
+            id
+            email
+            username
+            role
+        }
+    }
+    """
