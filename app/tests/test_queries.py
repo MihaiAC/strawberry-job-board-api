@@ -283,9 +283,6 @@ def test_get_all_users_as_admin(test_client, graphql_endpoint, admin_header):
     assert sorted([user["username"] for user in users]) == sorted(
         user["username"] for user in USERS_DATA
     )
-    # TODO: Make this into its own test - not even trying to retrieve test.
-    for user in users:
-        assert "password" not in user and "password_hash" not in user
 
 
 @pytest.mark.api

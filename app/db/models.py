@@ -21,11 +21,9 @@ from app.gql.types import (
     Base_gql,
 )
 
-from strawberry.types import Info
 from sqlalchemy import String, ForeignKey, UniqueConstraint
-from typing import List, Tuple, Union, Dict, Optional, Self
+from typing import List, Tuple, Dict, Self
 from graphql import GraphQLError
-from deprecated import deprecated
 
 SQL_CLASS_NAME_TO_CLASS = {"Employer"}
 
@@ -106,33 +104,6 @@ class Base(DeclarativeBase):
         else:
             return filtered_objs
 
-    # TODO: Remove when completely replaced.
-    @classmethod
-    @deprecated
-    def fetch_and_transform_to_gql(
-        cls,
-        info: Info,
-        id: int = None,
-        ignore_fields: List[str] = [],
-        **kwargs,
-    ) -> Union[Base_gql, List[Base_gql]]:
-        db_session = info.context["db_session"]
-        query = db_session.query(cls)
-
-        selected_fields = str(info.selected_fields)
-
-        if id:
-            query = query.filter_by(id=id)
-
-        query, additional_args = cls.apply_joins(query, selected_fields, ignore_fields)
-
-        if id:
-            cls_obj = query.first()
-            return cls_obj.to_gql(**additional_args)
-        else:
-            cls_objs = query.all()
-            return [cls_obj.to_gql(**additional_args) for cls_obj in cls_objs]
-
     def convert_class_name_to_gql_type_name(self) -> str:
         return f"{self.__class__.__name__}_gql"
 
@@ -149,7 +120,6 @@ class Base(DeclarativeBase):
         if not gql_class:
             raise GraphQLError(f"Strawberry type {gql_class_name} not found.")
 
-        # TODO: Need to improve password handling.
         gql_class_init_args = {
             field: getattr(self, field)
             for field in self.__table__.columns.keys()
@@ -329,8 +299,6 @@ class User(Base):
     )
 
 
-# TODO: Need to test what happens when trying to add existing
-# user-job application.
 class Application(Base):
     __tablename__ = "applications"
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))

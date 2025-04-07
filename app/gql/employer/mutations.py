@@ -12,7 +12,6 @@ from app.errors.error_messages import EMPLOYER_ALREADY_EXISTS
 
 @strawberry.type
 class EmployerMutation:
-    # TODO: Should check that employer email doesn't already exist.
     @strawberry.mutation
     @require_role([Role.ADMIN])
     def add_employer(

@@ -1,9 +1,6 @@
 import pytest
 from app.db.data import APPLICATIONS_DATA, JOBS_DATA
 from .utils import post_graphql, get_job_ids_for_user, get_test_first_non_admin_id
-from freezegun import freeze_time
-from app.settings.config import JWT_EXPIRATION_TIME_MINUTES
-from datetime import datetime, timezone, timedelta
 from app.errors.error_messages import ALREADY_APPLIED
 from app.errors.custom_errors import ResourceNotFound
 from app.db.repositories.application_repository import ApplicationRepository

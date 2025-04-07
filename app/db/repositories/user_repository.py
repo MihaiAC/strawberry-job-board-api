@@ -4,7 +4,6 @@ from typing import Optional, List
 
 
 class UserRepository:
-    # TODO: Update this in a similar way to ApplicationRepository.
     @staticmethod
     def get_user_by_email(db_session: Session, email: str) -> Optional[User_sql]:
         user = User_sql.get_by_attr(

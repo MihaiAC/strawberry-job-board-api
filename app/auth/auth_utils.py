@@ -14,7 +14,6 @@ from app.errors.error_messages import (
     MISSING_CONTEXT,
     INSUFFICIENT_PRIVILEGES,
 )
-from app.errors.custom_errors import ResourceNotFound
 from .roles import Role
 from typing import List, Callable
 from functools import wraps
