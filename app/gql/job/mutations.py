@@ -1,8 +1,7 @@
 import strawberry
 from strawberry.types import Info
-from app.db.models import Job as Job_sql, Job_gql
+from app.db.models import Job_gql
 from typing import Optional
-from app.errors.custom_errors import ResourceNotFound
 from app.auth.roles import Role
 from app.auth.auth_utils import require_role
 from app.db.repositories.job_repository import JobRepository
@@ -12,7 +11,6 @@ from sqlalchemy.orm import Session
 
 @strawberry.type
 class JobMutation:
-    # TODO: Modify those to use repository.
     @strawberry.mutation
     @require_role([Role.ADMIN])
     def add_job(
@@ -23,12 +21,12 @@ class JobMutation:
         info: Info,
     ) -> Job_gql:
         db_session = info.context["db_session"]
-        job_sql = Job_sql(title=title, description=description, employer_id=employer_id)
-        db_session.add(job_sql)
-        db_session.commit()
-        db_session.refresh(job_sql)
-
-        return job_sql.to_gql()
+        return JobRepository.add_job(
+            db_session=db_session,
+            title=title,
+            description=description,
+            employer_id=employer_id,
+        )
 
     @strawberry.mutation
     @require_role([Role.ADMIN])
@@ -45,24 +43,13 @@ class JobMutation:
         Throws error if no job with the given id has been found.
         """
         db_session = info.context["db_session"]
-
-        # Retrieve the job object.
-        job_sql = db_session.query(Job_sql).filter(Job_sql.id == job_id).first()
-        if not job_sql:
-            raise ResourceNotFound("Job")
-
-        if title is not None:
-            job_sql.title = title
-
-        if description is not None:
-            job_sql.description = description
-
-        if employer_id is not None:
-            job_sql.employer_id = employer_id
-
-        db_session.commit()
-        db_session.refresh(job_sql)
-        return job_sql.to_gql()
+        return JobRepository.update_job(
+            db_session=db_session,
+            job_id=job_id,
+            title=title,
+            description=description,
+            employer_id=employer_id,
+        )
 
     @strawberry.mutation
     @require_role([Role.ADMIN])
@@ -72,14 +59,4 @@ class JobMutation:
         info: Info,
     ) -> bool:
         db_session: Session = info.context["db_session"]
-        selected_fields = str(info.selected_fields)
-        job_sql = JobRepository.get_job_by_id(
-            db_session, selected_fields, id=job_id, gql=False
-        )
-        if not job_sql:
-            raise ResourceNotFound("Job")
-
-        db_session.delete(job_sql)
-        db_session.commit()
-
-        return True
+        return JobRepository.delete_job(db_session=db_session, job_id=job_id)
