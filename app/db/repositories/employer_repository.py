@@ -17,7 +17,12 @@ class EmployerRepository:
         id: int,
         gql: bool = True,
     ) -> Optional[Employer_gql | Employer_sql]:
-        result = Employer_sql.get_by_attr(db_session, selected_fields, "id", id, gql)
+        result = Employer_sql.get_all(
+            db_session=db_session,
+            selected_fields=selected_fields,
+            filter_by_attrs={"id": id},
+            gql=gql,
+        )
         return None if len(result) == 0 else result[0]
 
     @staticmethod
@@ -27,11 +32,10 @@ class EmployerRepository:
         email: str,
         gql: bool = True,
     ) -> Optional[Employer_gql | Employer_sql]:
-        result = Employer_sql.get_by_attr(
+        result = Employer_sql.get_all(
             db_session=db_session,
             selected_fields=selected_fields,
-            attr_name="contact_email",
-            attr_value=email,
+            filter_by_attrs={"contact_email": email},
             gql=gql,
         )
         return None if len(result) == 0 else result[0]

@@ -15,7 +15,12 @@ class JobRepository:
     def get_all_jobs_user(
         db_session: Session, selected_fields: str, user_id: int, gql: bool = True
     ) -> List[Job_gql | Job_sql]:
-        return Job_sql.get_all(db_session, selected_fields, gql, user_id=user_id)
+        return Job_sql.get_all(
+            db_session=db_session,
+            selected_fields=selected_fields,
+            gql=gql,
+            filter_by_attrs={"user_id": user_id},
+        )
 
     @staticmethod
     def get_all_jobs_unauth(
@@ -33,11 +38,10 @@ class JobRepository:
         id: int,
         gql: bool = True,
     ) -> Optional[Job_gql | Job_sql]:
-        jobs = Job_sql.get_by_attr(
-            db_session,
-            selected_fields,
-            "id",
-            id,
+        jobs = Job_sql.get_all(
+            db_session=db_session,
+            selected_fields=selected_fields,
+            filter_by_attrs={"id": id},
             ignore_fields=["applications"],
             gql=gql,
         )

@@ -18,26 +18,26 @@ class ApplicationRepository:
     def get_all_applications_by_user_id(
         db_session: Session, selected_fields: str, user_id: int, gql: bool = True
     ) -> List[Application_gql | Application_sql]:
-        return Application_sql.get_by_attr(
-            db_session, selected_fields, "user_id", user_id, gql
+        return Application_sql.get_all(
+            db_session=db_session,
+            selected_fields=selected_fields,
+            filter_by_attrs={"user_id": user_id},
+            gql=gql,
         )
 
     @staticmethod
     def get_all_applications_by_job_id(
         db_session: Session, selected_fields: str, job_id: int, gql: bool = True
     ) -> List[Application_gql | Application_sql]:
-        return Application_sql.get_by_attr(
-            db_session, selected_fields, "job_id", job_id, gql
+        return Application_sql.get_all(
+            db_session=db_session,
+            selected_fields=selected_fields,
+            filter_by_attrs={"job_id": job_id},
+            gql=gql,
         )
 
-    # TODO: After merging get functions, add attr list to args + retrieve
-    # application by both user_id and job_id to check if it already exists.
     @staticmethod
     def create_application(db_session: Session, user_id: int, job_id: int) -> bool:
-        user_applications = ApplicationRepository.get_all_applications_by_user_id(
-            db_session=db_session, selected_fields="", user_id=user_id, gql=False
-        )
-
         job = JobRepository.get_job_by_id(
             db_session=db_session,
             selected_fields="",
@@ -46,6 +46,13 @@ class ApplicationRepository:
 
         if job is None:
             raise ResourceNotFound("Job")
+
+        user_applications = Application_sql.get_all(
+            db_session=db_session,
+            selected_fields="",
+            filter_by_attrs={"user_id": user_id, "job_id": job_id},
+            gql=False,
+        )
 
         for application in user_applications:
             if application.job_id == job_id:
