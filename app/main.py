@@ -23,6 +23,7 @@ from sqlalchemy.orm import Session
 # TODO: Dockerize both the app and the testing.
 # TODO: How to handle token refreshing? (stretch goal).
 # TODO: All "add" functions should return the new object, without any joins.
+# TODO: Use strawberry input types.
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     prepare_database()

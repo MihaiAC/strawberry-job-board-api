@@ -102,7 +102,7 @@ def test_update_nonexisting_employer(
     result = post_graphql(test_client, graphql_endpoint, query, headers=admin_header)
     assert result["data"] is None
     assert "errors" in result
-    assert result["errors"][0]["message"] == ResourceNotFound("Employer")
+    assert result["errors"][0]["message"] == ResourceNotFound.get_message("Employer")
 
 
 @pytest.mark.api

@@ -44,6 +44,28 @@ def test_add_job(
 
 @pytest.mark.api
 @pytest.mark.mutation
+def test_add_job_nonexisting_employer(
+    test_client,
+    graphql_endpoint,
+    admin_header,
+):
+    num_employers = len(EMPLOYERS_DATA) + 1
+    query = f"""
+    mutation {{
+        addJob(title: "X title", description: "X descr", employerId: {num_employers}) {{
+            id
+            title
+            description
+            employerId
+        }}
+    }}
+    """
+    result = post_graphql(test_client, graphql_endpoint, query, headers=admin_header)
+    assert "errors" in result
+
+
+@pytest.mark.api
+@pytest.mark.mutation
 def test_successfully_update_existing_job_title(
     test_client,
     graphql_endpoint,
