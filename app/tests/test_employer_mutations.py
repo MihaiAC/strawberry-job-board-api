@@ -4,6 +4,7 @@ from .utils import post_graphql
 from app.db.repositories.employer_repository import EmployerRepository
 from app.db.repositories.job_repository import JobRepository
 from app.db.repositories.application_repository import ApplicationRepository
+from app.errors.error_messages import EMPLOYER_ALREADY_EXISTS
 
 
 @pytest.mark.api
@@ -32,6 +33,31 @@ def test_add_employer_complete_info(
     assert employer["name"] == employer_name
     assert employer["industry"] == employer_industry
     assert employer["contactEmail"] == employer_email
+
+
+@pytest.mark.api
+@pytest.mark.mutation
+def test_add_employer_existing_email(
+    test_client,
+    graphql_endpoint,
+    admin_header,
+):
+    employer_name = "X name"
+    employer_industry = "YZ industry"
+    employer_email = EMPLOYERS_DATA[0]["contact_email"]
+    query = f"""
+    mutation {{
+        addEmployer(name: "{employer_name}", industry: "{employer_industry}" contactEmail: "{employer_email}") {{
+            id
+            name
+            industry
+            contactEmail
+        }}
+    }}
+    """
+    result = post_graphql(test_client, graphql_endpoint, query, headers=admin_header)
+    assert "errors" in result
+    assert result["errors"][0]["message"] == EMPLOYER_ALREADY_EXISTS
 
 
 @pytest.mark.api
@@ -75,6 +101,7 @@ def test_update_nonexisting_employer(
     result = post_graphql(test_client, graphql_endpoint, query, headers=admin_header)
     assert result["data"] is None
     assert "errors" in result
+    # TODO: Don't use custom messages.
     assert "not found" in result["errors"][0]["message"]
 
 

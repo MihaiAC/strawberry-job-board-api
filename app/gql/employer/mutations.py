@@ -1,10 +1,13 @@
 import strawberry
 from strawberry.types import Info
 from app.db.models import Employer as Employer_sql, Employer_gql
+from app.db.repositories.employer_repository import EmployerRepository
 from typing import Optional
 from app.errors.custom_errors import ResourceNotFound
 from app.auth.roles import Role
 from app.auth.auth_utils import require_role
+from graphql import GraphQLError
+from app.errors.error_messages import EMPLOYER_ALREADY_EXISTS
 
 
 @strawberry.type
@@ -20,6 +23,14 @@ class EmployerMutation:
         info: Info,
     ) -> Employer_gql:
         db_session = info.context["db_session"]
+
+        # Enforce email uniqueness.
+        existing_employer = EmployerRepository.get_employer_by_email(
+            db_session=db_session, selected_fields="", email=contact_email, gql=True
+        )
+        if existing_employer is not None:
+            raise GraphQLError(EMPLOYER_ALREADY_EXISTS)
+
         employer_sql = Employer_sql(
             name=name, contact_email=contact_email, industry=industry
         )
