@@ -8,6 +8,7 @@ from .utils import (
 from collections import defaultdict
 
 
+# TODO: Better get tests - check that different resources are being retrieved with different IDs (had uncaught error earlier).
 @pytest.mark.api
 @pytest.mark.query
 def test_get_all_jobs(test_client, graphql_endpoint):
@@ -52,7 +53,7 @@ def test_get_job_by_id_all_roles(
         for headers in ["", user_header, admin_header]:
             result = post_graphql(test_client, graphql_endpoint, query, headers=headers)
             job = result["data"]["job"]
-            assert job["title"] == JOBS_DATA[0]["title"]
+            assert job["title"] == JOBS_DATA[job_id - 1]["title"]
             assert job["applications"] is None
             assert (
                 EMPLOYERS_DATA[job["employerId"] - 1]["name"] == job["employer"]["name"]
@@ -304,8 +305,8 @@ def test_get_all_users_as_user(test_client, graphql_endpoint, user_header):
     result = post_graphql(test_client, graphql_endpoint, query, headers=user_header)
     users = result["data"]["users"]
     assert len(users) == 1
-    assert users["id"] == get_test_first_non_admin_id()
-    assert users["email"] == get_test_first_non_admin_email()
+    assert users[0]["id"] == get_test_first_non_admin_id()
+    assert users[0]["email"] == get_test_first_non_admin_email()
 
 
 @pytest.mark.api
