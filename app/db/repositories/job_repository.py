@@ -30,7 +30,12 @@ class JobRepository:
         db_session: Session, selected_fields: str, id: int, gql: bool = True
     ) -> Optional[Job_gql | Job_sql]:
         jobs = Job_sql.get_by_attr(
-            db_session, selected_fields, "id", id, ignore_fields=["applications"]
+            db_session,
+            selected_fields,
+            "id",
+            id,
+            ignore_fields=["applications"],
+            gql=gql,
         )
 
         return jobs[0] if len(jobs) > 0 else None
