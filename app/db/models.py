@@ -276,9 +276,11 @@ class Job(Base):
         **kwargs,
     ) -> List[Self]:
         if user_id is None or "applications" in ignore_fields:
-            return super().get_all(
+            return super().get_by_attr(
                 db_session,
                 selected_fields,
+                attr_name,
+                attr_value,
                 gql=gql,
                 ignore_fields=ignore_fields,
                 **kwargs,
