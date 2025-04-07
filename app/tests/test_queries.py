@@ -8,7 +8,6 @@ from .utils import (
 from collections import defaultdict
 
 
-# TODO: Better get tests - check that different resources are being retrieved with different IDs (had uncaught error earlier).
 @pytest.mark.api
 @pytest.mark.query
 def test_get_all_jobs(test_client, graphql_endpoint):
@@ -175,16 +174,17 @@ def test_get_all_employers(test_client, graphql_endpoint):
 @pytest.mark.api
 @pytest.mark.query
 def test_get_employer_by_id(test_client, graphql_endpoint):
-    query = """
-    query {
-        employer(id: 1) {
-            name
-        }
-    }
-    """
-    result = post_graphql(test_client, graphql_endpoint, query)
-    employer = result["data"]["employer"]
-    assert employer["name"] == EMPLOYERS_DATA[0]["name"]
+    for employer_idx in range(len(EMPLOYERS_DATA)):
+        query = f"""
+        query {{
+            employer(id: {employer_idx+1}) {{
+                name
+            }}
+        }}
+        """
+        result = post_graphql(test_client, graphql_endpoint, query)
+        employer = result["data"]["employer"]
+        assert employer["name"] == EMPLOYERS_DATA[employer_idx]["name"]
 
 
 # This is playing a bit fast and loose with the IDs.
