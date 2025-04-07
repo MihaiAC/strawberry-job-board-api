@@ -1,10 +1,13 @@
 import strawberry
 from strawberry.types import Info
-from app.db.models import Job_gql, Job as Job_sql
+from app.db.models import Job as Job_sql, Job_gql
 from typing import Optional
 from app.errors.custom_errors import ResourceNotFound
 from app.auth.roles import Role
 from app.auth.auth_utils import require_role
+from app.db.repositories.job_repository import JobRepository
+
+from sqlalchemy.orm import Session
 
 
 @strawberry.type
@@ -68,10 +71,11 @@ class JobMutation:
         job_id: int,
         info: Info,
     ) -> bool:
-
-        db_session = info.context["db_session"]
-        job_sql = db_session.query(Job_sql).filter(Job_sql.id == job_id).first()
-
+        db_session: Session = info.context["db_session"]
+        selected_fields = str(info.selected_fields)
+        job_sql = JobRepository.get_job_by_id(
+            db_session, selected_fields, id=job_id, gql=False
+        )
         if not job_sql:
             raise ResourceNotFound("Job")
 
