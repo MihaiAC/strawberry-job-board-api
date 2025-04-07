@@ -9,7 +9,7 @@ from app.db.models import (
 )
 from copy import deepcopy
 from app.auth.auth_utils import hash_password
-from typing import Tuple
+from typing import Tuple, List
 from enum import Enum
 
 
@@ -79,8 +79,25 @@ def get_test_first_non_admin_id() -> str:
     return idx + 1
 
 
+def get_job_ids_for_user(user_id: int, applied: bool) -> List[int]:
+    job_ids = []
+    for application in APPLICATIONS_DATA:
+        if application["user_id"] == user_id:
+            job_ids.append(application["job_id"])
+
+    if applied:
+        return job_ids
+
+    return [job_id for job_id in range(1, len(JOBS_DATA) + 1) if job_id not in job_ids]
+
+
 class BaseQueries(str, Enum):
     APPLICATIONS = """query { applications { id } }"""
+    CREATE_APPLICATION = """
+        mutation {
+            applyToJob(jobId: 2)
+        }
+    """
     LOGIN = f"""mutation {{ loginUser (email: "{get_test_first_non_admin_email()}", password: "{get_test_first_non_admin_password()}")}}"""
     ADD_EMPLOYER = """mutation {
         addEmployer(name: "X", industry: "Y" contactEmail: "ZZZ@AAA.com") {

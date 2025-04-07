@@ -2,6 +2,7 @@ import pytest
 from .utils import BaseQueries, post_graphql
 
 
+# TODO: Maybe should add token expiration tests here.
 @pytest.mark.auth
 @pytest.mark.parametrize(
     "query, permissions",
@@ -17,6 +18,7 @@ from .utils import BaseQueries, post_graphql
         (BaseQueries.QUERY_ALL_JOBS, [True, True, True]),
         (BaseQueries.QUERY_JOB_BY_ID, [True, True, True]),
         (BaseQueries.QUERY_ALL_USERS, [False, True, True]),
+        (BaseQueries.CREATE_APPLICATION, [False, True, False]),
     ],
 )
 def test_permissions(
