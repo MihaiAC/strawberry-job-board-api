@@ -10,22 +10,11 @@ from app.errors.error_messages import (
     INSUFFICIENT_PRIVILEGES,
     EXPIRED_TOKEN,
 )
+from app.db.repositories.user_repository import UserRepository
 
 
-def assert_no_new_user_added(test_client, graphql_endpoint):
-    # Make sure no new user was added.
-    query = """
-    query {
-        users {
-            id
-            email
-            username
-            role
-        }
-    }
-    """
-    result = post_graphql(test_client, graphql_endpoint, query)
-    users = result["data"]["users"]
+def assert_no_new_user_added(db_session):
+    users = UserRepository.get_all_users(db_session, "", gql=False)
     assert len(users) == len(USERS_DATA)
 
 
@@ -60,7 +49,7 @@ def test_add_new_user_unauth(test_client, graphql_endpoint):
 @pytest.mark.api
 @pytest.mark.mutation
 @pytest.mark.auth
-def test_add_existing_user_unauth(test_client, graphql_endpoint):
+def test_add_existing_user_unauth(test_client, graphql_endpoint, db_session):
     username = "New User"
     email = USERS_DATA[0]["email"]
     password = "newpass123"
@@ -84,13 +73,13 @@ def test_add_existing_user_unauth(test_client, graphql_endpoint):
     assert "errors" in result
     assert result["errors"][0]["message"] == INVALID_AUTHORIZATION_HEADER
 
-    assert_no_new_user_added(test_client, graphql_endpoint)
+    assert_no_new_user_added(db_session)
 
 
 @pytest.mark.api
 @pytest.mark.mutation
 @pytest.mark.auth
-def test_add_new_admin_unauth(test_client, graphql_endpoint):
+def test_add_new_admin_unauth(test_client, graphql_endpoint, db_session):
     username = "New User"
     email = "new_email@example.com"
     password = "newpass123"
@@ -114,13 +103,18 @@ def test_add_new_admin_unauth(test_client, graphql_endpoint):
     assert "errors" in result
     assert result["errors"][0]["message"] == INVALID_AUTHORIZATION_HEADER
 
-    assert_no_new_user_added(test_client, graphql_endpoint)
+    assert_no_new_user_added(db_session)
 
 
 @pytest.mark.api
 @pytest.mark.mutation
 @pytest.mark.auth
-def test_add_new_admin_bad_token(test_client, graphql_endpoint, invalid_token_header):
+def test_add_new_admin_bad_token(
+    test_client,
+    graphql_endpoint,
+    invalid_token_header,
+    db_session,
+):
     username = "New User"
     email = "new_email@example.com"
     password = "newpass123"
@@ -148,13 +142,18 @@ def test_add_new_admin_bad_token(test_client, graphql_endpoint, invalid_token_he
     )
     assert "errors" in result
 
-    assert_no_new_user_added(test_client, graphql_endpoint)
+    assert_no_new_user_added(db_session)
 
 
 @pytest.mark.api
 @pytest.mark.mutation
 @pytest.mark.auth
-def test_add_new_admin_auth_as_user(test_client, graphql_endpoint, user_header):
+def test_add_new_admin_auth_as_user(
+    test_client,
+    graphql_endpoint,
+    user_header,
+    db_session,
+):
     username = "New User"
     email = "new_email@example.com"
     password = "newpass123"
@@ -182,13 +181,17 @@ def test_add_new_admin_auth_as_user(test_client, graphql_endpoint, user_header):
     )
     assert "errors" in result
     assert result["errors"][0]["message"] == INSUFFICIENT_PRIVILEGES
-    assert_no_new_user_added(test_client, graphql_endpoint)
+    assert_no_new_user_added(db_session)
 
 
 @pytest.mark.api
 @pytest.mark.mutation
 @pytest.mark.auth
-def test_add_new_admin_auth_as_admin(test_client, graphql_endpoint, admin_header):
+def test_add_new_admin_auth_as_admin(
+    test_client,
+    graphql_endpoint,
+    admin_header,
+):
     username = "New User"
     email = "new_email@example.com"
     password = "newpass123"
@@ -226,7 +229,10 @@ def test_add_new_admin_auth_as_admin(test_client, graphql_endpoint, admin_header
 @pytest.mark.mutation
 @pytest.mark.auth
 def test_add_new_admin_auth_as_admin_token_expired(
-    test_client, graphql_endpoint, admin_header
+    test_client,
+    graphql_endpoint,
+    admin_header,
+    db_session,
 ):
     username = "New User"
     email = "new_email@example.com"
@@ -260,4 +266,4 @@ def test_add_new_admin_auth_as_admin_token_expired(
 
     assert "errors" in result
     assert result["errors"][0]["message"] == EXPIRED_TOKEN
-    assert_no_new_user_added(test_client, graphql_endpoint)
+    assert_no_new_user_added(db_session)
