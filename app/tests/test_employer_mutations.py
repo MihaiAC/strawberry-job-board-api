@@ -5,6 +5,7 @@ from app.db.repositories.employer_repository import EmployerRepository
 from app.db.repositories.job_repository import JobRepository
 from app.db.repositories.application_repository import ApplicationRepository
 from app.errors.error_messages import EMPLOYER_ALREADY_EXISTS
+from app.errors.custom_errors import ResourceNotFound
 
 
 @pytest.mark.api
@@ -101,8 +102,7 @@ def test_update_nonexisting_employer(
     result = post_graphql(test_client, graphql_endpoint, query, headers=admin_header)
     assert result["data"] is None
     assert "errors" in result
-    # TODO: Don't use custom messages.
-    assert "not found" in result["errors"][0]["message"]
+    assert result["errors"][0]["message"] == ResourceNotFound("Employer")
 
 
 @pytest.mark.api

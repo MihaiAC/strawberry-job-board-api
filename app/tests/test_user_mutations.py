@@ -6,9 +6,7 @@ from app.settings.config import JWT_EXPIRATION_TIME_MINUTES
 from datetime import datetime, timezone, timedelta
 from app.errors.error_messages import (
     USER_ALREADY_EXISTS,
-    INVALID_AUTHORIZATION_HEADER,
     INSUFFICIENT_PRIVILEGES,
-    EXPIRED_TOKEN,
     INVALID_ROLE,
 )
 from app.db.repositories.user_repository import UserRepository

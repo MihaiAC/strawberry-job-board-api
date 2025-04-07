@@ -3,7 +3,7 @@ from .utils import BaseQueries, post_graphql
 from app.auth.roles import Role
 
 
-# TODO: Maybe should add token expiration tests here.
+# TODO: Add token expiration tests here.
 
 
 def generate_permission_tests():
