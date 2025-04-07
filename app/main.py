@@ -21,7 +21,8 @@ from sqlalchemy.orm import Session
 # TODO: .env usage is confusing - DB variables are ignored in tests, the
 # others are not.
 # TODO: Dockerize both the app and the testing.
-# TODO: How to handle token refreshing? (stretch goal)
+# TODO: How to handle token refreshing? (stretch goal).
+# TODO: All "add" functions should return the new object, without any joins.
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     prepare_database()
