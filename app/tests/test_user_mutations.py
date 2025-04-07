@@ -9,6 +9,7 @@ from app.errors.error_messages import (
     INVALID_AUTHORIZATION_HEADER,
     INSUFFICIENT_PRIVILEGES,
     EXPIRED_TOKEN,
+    INVALID_ROLE,
 )
 from app.db.repositories.user_repository import UserRepository
 
@@ -42,8 +43,39 @@ def test_add_new_user_unauth(test_client, graphql_endpoint):
     }}
     """
     result = post_graphql(test_client, graphql_endpoint, query)
+    assert "errors" not in result
+    result = result["data"]["addUser"]
+    assert result["id"] == len(USERS_DATA) + 1
+    assert result["username"] == username
+    assert result["role"] == role
+
+
+@pytest.mark.api
+@pytest.mark.mutation
+@pytest.mark.auth
+def test_add_new_user_unauth_invalid_role(test_client, graphql_endpoint):
+    username = "New User"
+    email = "newuser@example.com"
+    password = "newpass123"
+    role = "xyz"
+    query = f"""
+    mutation {{
+        addUser(
+            username: "{username}",
+            email: "{email}",
+            password: "{password}",
+            role: "{role}"
+        ) {{
+            id
+            username
+            email
+            role
+        }}
+    }}
+    """
+    result = post_graphql(test_client, graphql_endpoint, query)
     assert "errors" in result
-    assert result["errors"][0]["message"] == INVALID_AUTHORIZATION_HEADER
+    assert result["errors"][0]["message"] == INVALID_ROLE
 
 
 @pytest.mark.api
@@ -71,7 +103,7 @@ def test_add_existing_user_unauth(test_client, graphql_endpoint, db_session):
     """
     result = post_graphql(test_client, graphql_endpoint, query)
     assert "errors" in result
-    assert result["errors"][0]["message"] == INVALID_AUTHORIZATION_HEADER
+    assert result["errors"][0]["message"] == USER_ALREADY_EXISTS
 
     assert_no_new_user_added(db_session)
 
@@ -101,7 +133,7 @@ def test_add_new_admin_unauth(test_client, graphql_endpoint, db_session):
     """
     result = post_graphql(test_client, graphql_endpoint, query)
     assert "errors" in result
-    assert result["errors"][0]["message"] == INVALID_AUTHORIZATION_HEADER
+    assert result["errors"][0]["message"] == INSUFFICIENT_PRIVILEGES
 
     assert_no_new_user_added(db_session)
 
@@ -265,5 +297,5 @@ def test_add_new_admin_auth_as_admin_token_expired(
         )
 
     assert "errors" in result
-    assert result["errors"][0]["message"] == EXPIRED_TOKEN
+    assert result["errors"][0]["message"] == INSUFFICIENT_PRIVILEGES
     assert_no_new_user_added(db_session)

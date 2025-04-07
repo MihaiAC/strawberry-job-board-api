@@ -7,7 +7,14 @@ class UserRepository:
     # TODO: Update this in a similar way to ApplicationRepository.
     @staticmethod
     def get_user_by_email(db_session: Session, email: str) -> Optional[User_sql]:
-        return db_session.query(User_sql).filter_by(email=email).first()
+        user = User_sql.get_by_attr(
+            db_session=db_session,
+            selected_fields="",
+            attr_name="email",
+            attr_value=email,
+            gql=False,
+        )
+        return user[0] if len(user) > 0 else None
 
     @staticmethod
     def get_all_users(

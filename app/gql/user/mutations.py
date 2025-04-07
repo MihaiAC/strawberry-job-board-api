@@ -13,6 +13,7 @@ from app.errors.custom_errors import ResourceNotFound
 from app.errors.error_messages import (
     USER_ALREADY_EXISTS,
     INSUFFICIENT_PRIVILEGES,
+    INVALID_ROLE,
 )
 from app.auth.roles import Role
 
@@ -40,7 +41,7 @@ class LoginMutation:
 class UserMutation:
 
     @strawberry.mutation
-    @require_role([Role.ADMIN])
+    @require_role([Role.ADMIN, Role.UNAUTHENTICATED])
     def add_user(
         username: str, email: str, password: str, role: str, info: Info
     ) -> User_gql:
@@ -51,16 +52,20 @@ class UserMutation:
             if info.context["user"] is None or info.context["user"].role != Role.ADMIN:
                 raise GraphQLError(INSUFFICIENT_PRIVILEGES)
 
-        user_to_add = UserRepository.get_user_by_email(db_session, email)
-        if user_to_add:
-            raise GraphQLError(USER_ALREADY_EXISTS)
+        if role == Role.USER or role == Role.ADMIN:
+            user_to_add = UserRepository.get_user_by_email(db_session, email)
 
-        password_hash = hash_password(password)
-        user_to_add = User_sql(
-            username=username, email=email, password_hash=password_hash, role=role
-        )
-        db_session.add(user_to_add)
-        db_session.commit()
-        db_session.refresh(user_to_add)
+            if user_to_add is not None:
+                raise GraphQLError(USER_ALREADY_EXISTS)
 
-        return user_to_add.to_gql()
+            password_hash = hash_password(password)
+            user_to_add = User_sql(
+                username=username, email=email, password_hash=password_hash, role=role
+            )
+            db_session.add(user_to_add)
+            db_session.commit()
+            db_session.refresh(user_to_add)
+
+            return user_to_add.to_gql()
+        else:
+            raise GraphQLError(INVALID_ROLE)

@@ -148,3 +148,17 @@ class BaseQueries(str, Enum):
         }
     }
     """
+    ADD_USER = """mutation {
+        addUser(
+            username: "username",
+            email: "email@example.com",
+            password: "password",
+            role: "user"
+        ) {
+            id
+            username
+            email
+            role
+        }
+    }
+    """
