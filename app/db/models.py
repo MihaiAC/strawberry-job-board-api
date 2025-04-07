@@ -61,11 +61,6 @@ class Base(DeclarativeBase):
                 additional_args[field_name] = True
         return query, additional_args
 
-    # TODO: Merge get_all and get_by_attr (redundant, just add argument).
-    # TODO: Also add a docstring to it, since it grew large.
-    # TODO: Should repo methods match get functions exactly?
-    # TODO: Move ignore_fields back to applications only and re-name it ignore_applications.
-    # TODO: Rename selected_fields to selected_joins or something more appropriate.
     @classmethod
     def get_all(
         cls: Self,
@@ -76,6 +71,16 @@ class Base(DeclarativeBase):
         ignore_fields: List[str] = [],
         **kwargs,
     ) -> List[Self]:
+        """
+        cls: Current SQLAlchemy class.
+        db_session: Current session object.
+        selected_fields: Argument with the same name from the strawberry.Info
+        object, cast as string; extracting FKs to join on from it - ideally should have a parser
+        do this, but it's out of the scope of this project.
+        gql: Whether to cast the returned SQL objects to their equivalent strawberry type
+        filter_by_attrs: Attributes to filter on.
+        ignore_fields: Again a misnomer, FKs to not join on (has to do with auth).
+        """
         query = db_session.query(cls)
         query, FKs_to_convert = cls.apply_joins(query, selected_fields, ignore_fields)
 
