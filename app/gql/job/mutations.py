@@ -9,7 +9,7 @@ from app.auth.auth_utils import require_role
 
 @strawberry.type
 class JobMutation:
-
+    # TODO: Modify those to use repository.
     @strawberry.mutation
     @require_role([Role.ADMIN])
     def add_job(
