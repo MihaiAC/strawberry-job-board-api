@@ -72,16 +72,21 @@ class Base(DeclarativeBase):
         db_session: Session,
         selected_fields: str,
         gql: bool = True,
+        filter_by_attrs: Dict[str, any] = {},
         ignore_fields: List[str] = [],
         **kwargs,
     ) -> List[Self]:
         query = db_session.query(cls)
         query, FKs_to_convert = cls.apply_joins(query, selected_fields, ignore_fields)
-        all_objs = query.all()
+
+        for attr_name, attr_value in filter_by_attrs.items():
+            query = query.filter(getattr(cls, attr_name) == attr_value)
+
+        result_objs = query.all()
         if gql:
-            return [obj.to_gql(**FKs_to_convert) for obj in all_objs]
+            return [obj.to_gql(**FKs_to_convert) for obj in result_objs]
         else:
-            return all_objs
+            return result_objs
 
     @classmethod
     def get_by_attr(
@@ -195,17 +200,24 @@ class Job(Base):
         selected_fields: str,
         gql: bool = True,
         ignore_fields: List[str] = [],
-        user_id: int = None,
+        filter_by_attrs: Dict[str, any] = {},
         **kwargs,
     ) -> List[Self]:
+        user_id = filter_by_attrs.get("user_id", None)
+
         if user_id is None or "applications" in ignore_fields:
             return super().get_all(
                 db_session,
                 selected_fields,
                 gql=gql,
                 ignore_fields=ignore_fields,
+                filter_by_attrs=filter_by_attrs,
                 **kwargs,
             )
+
+        # We're already filtering by user_id.
+        del filter_by_attrs["user_id"]
+
         # If user_id is not None, we must retrieve only the current user's
         # applications.
         subquery = (
@@ -228,56 +240,9 @@ class Job(Base):
         all_objs = query.all()
         FKs_to_convert["applications"] = True
 
-        if gql:
-            return [obj.to_gql(**FKs_to_convert) for obj in all_objs]
-        else:
-            return all_objs
+        for attr_name, attr_value in filter_by_attrs.items():
+            query = query.filter(getattr(cls, attr_name) == attr_value)
 
-    @classmethod
-    def get_by_attr(
-        cls: Self,
-        db_session: Session,
-        selected_fields: str,
-        attr_name: str,
-        attr_value: any,
-        gql: bool = True,
-        ignore_fields: List[str] = [],
-        user_id: int = None,
-        **kwargs,
-    ) -> List[Self]:
-        if user_id is None or "applications" in ignore_fields:
-            return super().get_by_attr(
-                db_session,
-                selected_fields,
-                attr_name,
-                attr_value,
-                gql=gql,
-                ignore_fields=ignore_fields,
-                **kwargs,
-            )
-
-        # If user_id is not None, we must retrieve only the current user's
-        # applications.
-        subquery = (
-            db_session.query(Application)
-            .filter(Application.user_id == user_id)
-            .subquery()
-        )
-
-        query = (
-            db_session.query(cls)
-            .outerjoin(subquery, cls.id == subquery.c.job_id)
-            .options(contains_eager(cls.applications, alias=subquery))
-        )
-
-        # Apply joinedloads.
-        query, FKs_to_convert = cls.apply_joins(
-            query, selected_fields, ["applications"], **kwargs
-        )
-
-        query = query.filter(getattr(cls, attr_name) == attr_value)
-        FKs_to_convert["applications"] = True
-        all_objs = query.all()
         if gql:
             return [obj.to_gql(**FKs_to_convert) for obj in all_objs]
         else:
