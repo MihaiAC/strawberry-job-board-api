@@ -1,23 +1,53 @@
-type Employer {
+type ApplicationGql {
+  id: Int!
+  userId: Int!
+  jobId: Int!
+  user: UserGql
+  job: JobGql
+}
+
+type EmployerGql {
   id: Int!
   name: String!
   contactEmail: String!
   industry: String!
-  jobs: [Job!]!
+  jobs: [JobGql!]
 }
 
-type Job {
+type JobGql {
   id: Int!
   title: String!
   description: String!
   employerId: Int!
-  employer: Employer!
+  employer: EmployerGql
+  applications: [ApplicationGql!]
+}
+
+type Mutation {
+  addEmployer(name: String!, contactEmail: String!, industry: String!): EmployerGql!
+  updateEmployer(employerId: Int!, name: String = null, industry: String = null, contactEmail: Int = null): EmployerGql!
+  deleteEmployer(employerId: Int!): Boolean!
+  addJob(title: String!, description: String!, employerId: Int!): JobGql!
+  updateJob(jobId: Int!, title: String = null, description: String = null, employerId: Int = null): JobGql!
+  deleteJob(jobId: Int!): Boolean!
+  loginUser(email: String!, password: String!): String!
+  addUser(username: String!, email: String!, password: String!, role: String!): UserGql!
+  applyToJob(jobId: Int!): Boolean!
 }
 
 type Query {
-  hello(name: String!): String!
-  jobs: [Job!]!
-  employers: [Employer!]!
-  job(id: Int!): Job!
-  employer(id: Int!): Employer!
+  employers: [EmployerGql!]!
+  employer(id: Int!): EmployerGql
+  jobs: [JobGql!]!
+  job(id: Int!): JobGql
+  users: [UserGql!]!
+  applications: [ApplicationGql!]!
+}
+
+type UserGql {
+  id: Int!
+  username: String!
+  email: String!
+  role: String!
+  applications: [ApplicationGql!]
 }
