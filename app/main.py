@@ -12,7 +12,6 @@ from .db.models import Employer as Employer_sql, Job as Job_sql
 from sqlalchemy.orm import Session
 
 
-# TODO: Dockerize both the app and the testing.
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     prepare_database()
