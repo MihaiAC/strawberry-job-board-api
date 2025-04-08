@@ -83,6 +83,7 @@ Code-first
 Issues:
 - Strawberry doesn't really have an integration with SQLAlchemy aside from a project that seems to be a bit inflexible.
 - Referencing other objects + circular references => gets really complicated really fast, especially for nested queries.
+- to_gql conversions
 
 U, A, N 
 N = unauthenticated
@@ -111,3 +112,8 @@ Handling deprecated functions.
 References:
 Reference for the tests that actually worked: [link](https://pytest-with-eric.com/api-testing/pytest-api-testing-2/).
 Reference for managing context with Strawberry: [link](https://www.ricdelgado.com/articles/17-building-fastapi-strawberry-nextjs-rsc-pt3/).
+
+
+
+https://graphql-kit.com/graphql-voyager/
+

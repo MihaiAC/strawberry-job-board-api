@@ -15,4 +15,5 @@ dependencies:
   - conda-forge::pyjwt
   - conda-forge::freezegun
   - conda-forge::deprecated
+  - conda-forge::sqlacodegen
 prefix: /home/mihaiac/miniconda3/envs/strawberry_fast_api
