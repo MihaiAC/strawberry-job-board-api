@@ -1,5 +1,7 @@
 #### Nested Queries
 
+Mention N+1 problem in relation to this.
+
 The naive way is to just put lazy="joined" on every relationship, but even that doesn't cover every case e.g: 
 ```
 query {
@@ -55,4 +57,57 @@ Open questions:
 - How can you limit a query's lateral depth?
 - How can you limit the number of records returned?
 - How can you limit the number of queries a user can perform in a given time window?  - probably not GraphQL related - although what is you want to restrict only certain kinds of queries -> we're back to ascribing query complexity.
-- Potential improvements: Use strawberry input types - 
+Potential improvements: 
+- Use strawberry input types.
+- Special role for employer - add, remove jobs.
+
+Readme.md
+Things to do still:
+- Image with relationships between entities (DB).
+- 
+
+
+Strawberry-graphql
+Fastapi (+ default uvicorn for setting up)
+Containers for dbs + app + testing
+Separate db for testing
+Tests with pytest
+SQLAlchemy as ORM
+Postgres as DB.
+Circular references - depth limiting
+Auth with jwt token (+ expiration), account creation, authorization model table below.
+Repository pattern for mutation -> db.
+Refactoring code trivial with testing.
+Code-first
+
+Issues:
+- Strawberry doesn't really have an integration with SQLAlchemy aside from a project that seems to be a bit inflexible.
+- Referencing other objects + circular references => gets really complicated really fast, especially for nested queries.
+
+U, A, N 
+N = unauthenticated
+U = auth as user
+A = auth as admin
+
+| **Endpoint**      | **Permissions** |
+| ----------------- | --------------- |
+| `applications`    | U, A            |
+| `employers`       | U, A, N         |
+| `employer`        | U, A, N         |
+| `job`             | U, A            |
+| `jobs`            | U, A            |
+| `users`           | U, A            |
+| `add_employer`    | A               |
+| `update_employer` | A               |
+| `delete_employer` | A               |
+| `add_job`         | A               |
+| `update_job`      | A               |
+| `delete_job`      | A               |
+| `login_user`      | N               |
+| `add_user`        | N, A            |
+
+Handling deprecated functions.
+
+References:
+Reference for the tests that actually worked: [link](https://pytest-with-eric.com/api-testing/pytest-api-testing-2/).
+Reference for managing context with Strawberry: [link](https://www.ricdelgado.com/articles/17-building-fastapi-strawberry-nextjs-rsc-pt3/).
