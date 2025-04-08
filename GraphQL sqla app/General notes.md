@@ -50,3 +50,9 @@ So - use either the first one or both depending on the use case.
 
 Confusingly, FK ondelete -> on the object to be deleted (e.g: Job).
 cascade="all, delete-orphan" -> on the parent (Employer -> Job is a 1-to-many, put it on the relationship there).
+
+Open questions:
+- How can you limit a query's lateral depth?
+- How can you limit the number of records returned?
+- How can you limit the number of queries a user can perform in a given time window?  - probably not GraphQL related - although what is you want to restrict only certain kinds of queries -> we're back to ascribing query complexity.
+- Potential improvements: Use strawberry input types - 

@@ -12,18 +12,7 @@ from .db.models import Employer as Employer_sql, Job as Job_sql
 from sqlalchemy.orm import Session
 
 
-# TODO: How can you limit a query's lateral depth?
-# TODO: How can you limit the number of records returned?
-# TODO: How can you limit the number of queries a user can perform in a
-# given time window?
-# TODO: Should use strawberry input types.
-# TODO: Centralise error messages in a constants file + custom errors.
-# TODO: .env usage is confusing - DB variables are ignored in tests, the
-# others are not.
 # TODO: Dockerize both the app and the testing.
-# TODO: How to handle token refreshing? (stretch goal).
-# TODO: All "add" functions should return the new object, without any joins.
-# TODO: Use strawberry input types.
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     prepare_database()
