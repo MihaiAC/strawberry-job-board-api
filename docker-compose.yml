@@ -13,9 +13,7 @@ services:
   postgres_test:
     image: postgres:17
     container_name: postgres_test
-    environment:
-      - POSTGRES_USER=test_user
-      - POSTGRES_PASSWORD=test_pass
-      - POSTGRES_DB=test_db
+    env_file:
+     - .env.test
     ports:
       - "5433:5432"

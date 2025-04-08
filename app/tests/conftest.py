@@ -14,22 +14,14 @@ from .utils import (
     get_test_first_non_admin_email,
 )
 from app.auth.auth_utils import generate_jwt_token
+from app.settings.config import DATABASE_URL
 
 
 # Assumption: Docker container containing test db has to be running
 # prior to the test being run.
-def pytest_addoption(parser):
-    parser.addoption(
-        "--dburl",
-        action="store",
-        help="Test DB URL.",
-        default="postgresql+psycopg://test_user:test_pass@localhost:5433/test_db",
-    )
-
-
 @pytest.hookimpl(tryfirst=True)
 def pytest_sessionstart(session):
-    db_url = session.config.getoption("--dburl")
+    db_url = DATABASE_URL
     try:
         engine = create_engine(
             db_url,
@@ -45,7 +37,7 @@ def pytest_sessionstart(session):
 
 @pytest.fixture(scope="session")
 def db_url(request):
-    return request.config.getoption("--dburl")
+    return DATABASE_URL
 
 
 @pytest.fixture(scope="function")
@@ -110,16 +102,11 @@ def graphql_endpoint():
     return "/graphql"
 
 
-# import json
-
-
 @pytest.fixture(scope="session")
 def admin_header() -> str:
     admin_email = get_test_admin_email()
     token = generate_jwt_token(admin_email)
     header = {"Authorization": f"Bearer {token}"}
-    # with open("./admin_header.txt", "w") as f:
-    #     f.write(json.dumps(header))
     return header
 
 
@@ -128,8 +115,6 @@ def user_header() -> str:
     user_email = get_test_first_non_admin_email()
     token = generate_jwt_token(user_email)
     header = {"Authorization": f"Bearer {token}"}
-    # with open("./user_header.txt", "w") as f:
-    #     f.write(json.dumps(header))
     return header
 
 
