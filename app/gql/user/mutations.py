@@ -17,6 +17,7 @@ from app.errors.error_messages import (
     INVALID_ROLE,
 )
 from app.auth.roles import Role
+from app.sql_to_gql import user_to_gql
 
 
 @strawberry.type
@@ -65,6 +66,6 @@ class UserMutation:
             db_session.commit()
             db_session.refresh(user_to_add)
 
-            return user_to_add.to_gql()
+            return user_to_gql(user_to_add)
         else:
             raise GraphQLError(INVALID_ROLE)

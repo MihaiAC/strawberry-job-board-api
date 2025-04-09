@@ -116,3 +116,5 @@ How .env and .env.test look like.
 
 https://graphql-kit.com/graphql-voyager/
 
+Generating test tokens:
+python -m app.tests.utils

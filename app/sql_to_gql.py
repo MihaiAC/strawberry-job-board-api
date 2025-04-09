@@ -4,16 +4,12 @@ from .db.models import (
     User as User_sql,
     Application as Application_sql,
 )
-from .gql.types import (
-    Employer_gql,
-    Job_gql,
-    User_gql,
-    Application_gql,
-)
 
 
 # TODO: Boilerplate to avoid circular imports.
-def employer_to_gql(employer_sql: Employer_sql) -> Employer_gql:
+def employer_to_gql(employer_sql: Employer_sql) -> "Employer_gql":
+    from app.gql.types import Employer_gql
+
     return Employer_gql(
         id=employer_sql.id,
         name=employer_sql.name,
@@ -22,7 +18,9 @@ def employer_to_gql(employer_sql: Employer_sql) -> Employer_gql:
     )
 
 
-def job_to_gql(job_sql: Job_sql) -> Job_gql:
+def job_to_gql(job_sql: Job_sql) -> "Job_gql":
+    from app.gql.types import Job_gql
+
     return Job_gql(
         id=job_sql.id,
         title=job_sql.title,
@@ -31,7 +29,9 @@ def job_to_gql(job_sql: Job_sql) -> Job_gql:
     )
 
 
-def application_to_gql(application_sql: Application_sql) -> Application_gql:
+def application_to_gql(application_sql: Application_sql) -> "Application_gql":
+    from app.gql.types import Application_gql
+
     return Application_gql(
         id=application_sql.id,
         user_id=application_sql.user_id,
@@ -39,7 +39,9 @@ def application_to_gql(application_sql: Application_sql) -> Application_gql:
     )
 
 
-def user_to_gql(user_sql: User_sql) -> User_gql:
+def user_to_gql(user_sql: User_sql) -> "User_gql":
+    from app.gql.types import User_gql
+
     return User_gql(
         id=user_sql.id,
         username=user_sql.username,

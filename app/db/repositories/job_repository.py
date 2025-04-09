@@ -3,6 +3,7 @@ from typing import List, Optional
 from app.db.models import Job as Job_sql
 from app.gql.types import Job_gql
 from app.errors.custom_errors import ResourceNotFound
+from app.sql_to_gql import job_to_gql
 
 
 class JobRepository:
@@ -58,7 +59,7 @@ class JobRepository:
         db_session.commit()
         db_session.refresh(job_sql)
 
-        return job_sql.to_gql()
+        return job_to_gql(job_sql)
 
     @staticmethod
     def update_job(
@@ -90,7 +91,7 @@ class JobRepository:
 
         db_session.commit()
         db_session.refresh(job_sql)
-        return job_sql.to_gql()
+        return job_to_gql(job_sql)
 
     @staticmethod
     def delete_job(db_session: Session, job_id: int) -> bool:
