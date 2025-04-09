@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from app.db.models import Employer as Employer_sql, Employer_gql
+from app.db.models import Employer as Employer_sql
+from app.gql.types import Employer_gql
 
 
 class EmployerRepository:
@@ -39,3 +40,14 @@ class EmployerRepository:
             gql=gql,
         )
         return None if len(result) == 0 else result[0]
+
+    @staticmethod
+    def get_employers_by_ids(
+        db_session: Session,
+        employer_ids: List[int],
+    ) -> List[Employer_sql]:
+        employers = (
+            db_session.query(Employer_sql).filter(Employer_sql.id.in_(employer_ids))
+        ).all()
+
+        return employers

@@ -1,6 +1,20 @@
+Small Python project exploring working with GraphQL. Stack used:
+- Strawberry - code-first Python GraphQL library.
+- SQLAlchemy as the ORM for a Postgres DB
+- FastAPI for exposing the endpoint and injecting request context into the Strawberry queries/mutations
+- Fully-tested with pytest
+- Containerized app, testing and DBs (dev, test)
+- Authentication model with JWTs that expire
+- Explored an authorization model for different queries, mutations, DB tables
+
+Repository pattern for mutation -> db.
+Refactoring code trivial with testing
+
 #### Nested Queries
 
 Mention N+1 problem in relation to this.
+Mention how you did it before discovering field resolvers?
+First time around was not aware of the existence of DataLoaders and thought I had to implement a join resolver myself => restricted depth and created a naive implementation. But I was working against the way in which this was supposed to be done.
 
 The naive way is to just put lazy="joined" on every relationship, but even that doesn't cover every case e.g: 
 ```
@@ -61,24 +75,9 @@ Potential improvements:
 - Use strawberry input types.
 - Special role for employer - add, remove jobs.
 
-Readme.md
-Things to do still:
-- Image with relationships between entities (DB).
-- 
 
 
-Strawberry-graphql
-Fastapi (+ default uvicorn for setting up)
-Containers for dbs + app + testing
-Separate db for testing
-Tests with pytest
-SQLAlchemy as ORM
-Postgres as DB.
-Circular references - depth limiting
-Auth with jwt token (+ expiration), account creation, authorization model table below.
-Repository pattern for mutation -> db.
-Refactoring code trivial with testing.
-Code-first
+
 
 Issues:
 - Strawberry doesn't really have an integration with SQLAlchemy aside from a project that seems to be a bit inflexible.
@@ -113,7 +112,7 @@ References:
 Reference for the tests that actually worked: [link](https://pytest-with-eric.com/api-testing/pytest-api-testing-2/).
 Reference for managing context with Strawberry: [link](https://www.ricdelgado.com/articles/17-building-fastapi-strawberry-nextjs-rsc-pt3/).
 
-
+How .env and .env.test look like.
 
 https://graphql-kit.com/graphql-voyager/
 

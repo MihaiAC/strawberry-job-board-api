@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
-from typing import List
+from sqlalchemy import and_, or_
+from typing import List, Tuple
 from app.db.models import Application as Application_sql
 from app.gql.types import Application_gql
 from graphql import GraphQLError
@@ -36,6 +37,44 @@ class ApplicationRepository:
             filter_by_attrs={"job_id": job_id},
             gql=gql,
         )
+
+    @staticmethod
+    def get_applications_from_job_ids(
+        db_session: Session, job_ids: List[int]
+    ) -> List[Application_sql]:
+        applications = (
+            db_session.query(Application_sql).filter(
+                Application_sql.job_id.in_(job_ids)
+            )
+        ).all()
+
+        return applications
+
+    @staticmethod
+    def get_applications_from_user_ids(
+        db_session: Session, user_ids: List[int]
+    ) -> List[Application_sql]:
+        applications = (
+            db_session.query(Application_sql).filter(
+                Application_sql.user_id.in_(user_ids)
+            )
+        ).all()
+
+        return applications
+
+    @staticmethod
+    def get_all_applications_from_job_user_ids(
+        db_session: Session, job_user_id_tuples: List[Tuple[int, int]]
+    ) -> List[Application_sql]:
+        # Build compound filter.
+        filters = [
+            and_(Application_sql.job_id == job_id, Application_sql.user_id == user_id)
+            for job_id, user_id in job_user_id_tuples
+        ]
+
+        applications = db_session.query(Application_sql).filter(or_(*filters)).all()
+
+        return applications
 
     @staticmethod
     def create_application(db_session: Session, user_id: int, job_id: int) -> bool:
