@@ -1,6 +1,7 @@
 import strawberry
 from strawberry.types import Info
-from app.db.models import User as User_sql, User_gql
+from app.db.models import User as User_sql
+from app.gql.types import User_gql
 from graphql import GraphQLError
 from app.auth.auth_utils import (
     verify_password,

@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from typing import List
-from app.db.models import Application as Application_sql, Application_gql
+from app.db.models import Application as Application_sql
+from app.gql.types import Application_gql
 from graphql import GraphQLError
 from app.errors.error_messages import ALREADY_APPLIED
 from app.errors.custom_errors import ResourceNotFound

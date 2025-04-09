@@ -1,6 +1,7 @@
 import strawberry
 from strawberry.types import Info
-from app.db.models import Employer as Employer_sql, Employer_gql
+from app.db.models import Employer as Employer_sql
+from app.gql.types import Employer_gql
 from app.db.repositories.employer_repository import EmployerRepository
 from typing import Optional
 from app.errors.custom_errors import ResourceNotFound

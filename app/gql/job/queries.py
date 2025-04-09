@@ -1,7 +1,7 @@
 import strawberry
 from strawberry.types import Info
 from typing import List, Optional
-from app.db.models import Job_gql
+from app.gql.types import Job_gql
 from app.auth.auth_utils import require_role
 from app.auth.roles import Role
 from app.db.repositories.job_repository import JobRepository
