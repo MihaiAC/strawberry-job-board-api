@@ -14,7 +14,3 @@ COPY ./app /app
 
 # Expose port.
 EXPOSE 8000
-
-# Run app.
-# Run FastAPI app
-CMD ["conda", "run", "-n", "strawberry_fast_api", "fastapi", "run", "main.py", "--host", "0.0.0.0", "--port", "8000"]
