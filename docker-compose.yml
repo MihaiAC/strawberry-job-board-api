@@ -5,7 +5,7 @@ services:
     env_file:
       - ./app/.env
     ports:
-      - "${PORT}:5432"
+      - "5432:5432"
   postgres_test:
     image: postgres:17
     container_name: postgres_test
@@ -24,7 +24,7 @@ services:
       - "8000:8000"
     environment:
       - ENV_FILE=/app/.env
-    command: ["conda", "run", "-n", "strawberry_fast_api", "fastapi", "run", "main.py", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    command: ["conda", "run", "-n", "strawberry_fast_api", "--no-capture-output", "fastapi", "run", "main.py", "--host", "0.0.0.0", "--port", "8000", "--reload"]
     volumes:
       - ./app:/app
   pytest:
@@ -36,7 +36,7 @@ services:
       - postgres_test
     environment:
       - ENV_FILE=/app/.env.test
-    command: ["conda", "run", "-n", "strawberry_fast_api", "tail", "-f", "/dev/null"]
+    command: ["conda", "run", "-n", "strawberry_fast_api", "--no-capture-output", "tail", "-f", "/dev/null"]
     volumes:
       - ./app:/app
 
