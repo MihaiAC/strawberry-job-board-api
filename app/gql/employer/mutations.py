@@ -9,6 +9,7 @@ from app.auth.roles import Role
 from app.auth.auth_utils import require_role
 from graphql import GraphQLError
 from app.errors.error_messages import EMPLOYER_ALREADY_EXISTS
+from app.sql_to_gql import employer_to_gql
 
 
 @strawberry.type
@@ -38,7 +39,7 @@ class EmployerMutation:
         db_session.commit()
         db_session.refresh(employer_sql)
 
-        return employer_sql.to_gql()
+        return employer_to_gql(employer_sql)
 
     @strawberry.mutation
     @require_role([Role.ADMIN])
@@ -76,7 +77,7 @@ class EmployerMutation:
 
         db_session.commit()
         db_session.refresh(employer_sql)
-        return employer_sql.to_gql()
+        return employer_to_gql(employer_sql)
 
     @strawberry.mutation
     @require_role([Role.ADMIN])

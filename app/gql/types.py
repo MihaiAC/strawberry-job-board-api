@@ -3,6 +3,7 @@ from strawberry.types import Info
 from typing import List, Optional
 from app.auth.auth_utils import require_role
 from app.auth.roles import Role
+from app.sql_to_gql import employer_to_gql, job_to_gql, application_to_gql
 
 
 class Base_gql:
@@ -20,7 +21,7 @@ class Employer_gql(Base_gql):
     async def jobs(self, info: Info) -> List["Job_gql"]:
         loader = info.context["loaders"]["jobs_from_employer"]
         jobs_sql = await loader.load(self.id)
-        return [job.to_gql() for job in jobs_sql]
+        return [job_to_gql(job) for job in jobs_sql]
 
 
 @strawberry.type
@@ -34,7 +35,7 @@ class Job_gql(Base_gql):
     async def employer(self, info: Info) -> Optional[Employer_gql]:
         loader = info.context["loaders"]["employer_from_jobs"]
         employer_sql = await loader.load(self.employer_id)
-        return employer_sql.to_gql()
+        return employer_to_gql(employer_sql)
 
     @strawberry.field
     @require_role([Role.USER, Role.ADMIN, Role.UNAUTHENTICATED])
@@ -51,7 +52,7 @@ class Job_gql(Base_gql):
             applications_sql = await loader.load(self.id)
         else:
             return []
-        return [app.to_gql() for app in applications_sql]
+        return [application_to_gql(app) for app in applications_sql]
 
 
 @strawberry.type
@@ -73,7 +74,7 @@ class User_gql(Base_gql):
         loader = info.context["loaders"]["applications_from_user"]
         applications_sql = await loader.load(self.id)
 
-        return [app.to_gql() for app in applications_sql]
+        return [application_to_gql(app) for app in applications_sql]
 
 
 @strawberry.type
