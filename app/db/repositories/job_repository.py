@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from app.db.models import Job as Job_sql, Job_gql
+from app.db.models import Job as Job_sql
+from app.gql.types import Job_gql
 from app.errors.custom_errors import ResourceNotFound
 
 
@@ -107,3 +108,14 @@ class JobRepository:
         db_session.commit()
 
         return True
+
+    @staticmethod
+    def get_jobs_by_employer_ids(
+        db_session: Session, employer_ids: List[int]
+    ) -> List[Job_sql]:
+        # TODO: Need to adapt SQL get_all to this - filter_by_attr check if list.
+        jobs = (
+            db_session.query(Job_sql).filter(Job_sql.employer_id.in_(employer_ids))
+        ).all()
+
+        return jobs
