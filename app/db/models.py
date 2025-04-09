@@ -7,23 +7,11 @@ from sqlalchemy.orm import (
     Mapped,
     relationship,
     class_mapper,
-    Query,
-    joinedload,
     Session,
-    contains_eager,
-)
-
-from app.gql.types import (
-    Employer_gql,
-    Job_gql,
-    User_gql,
-    Application_gql,
-    Base_gql,
 )
 
 from sqlalchemy import String, ForeignKey, UniqueConstraint
-from typing import List, Tuple, Dict, Self
-from graphql import GraphQLError
+from typing import List, Dict, Self
 
 SQL_CLASS_NAME_TO_CLASS = {"Employer"}
 
@@ -40,26 +28,6 @@ class Base(DeclarativeBase):
             return [rel.key for rel in class_mapper(cls).relationships]
         except Exception:
             return []
-
-    @classmethod
-    def apply_joins(
-        cls,
-        query: Query,
-        selected_fields: str,
-        ignore_fields: List[str],
-        **kwargs,
-    ) -> Tuple[Query, Dict[str, bool]]:
-        """
-        Naively decides what joinedloads to do.
-        Works only because nested depth is limited to 1.
-        To extend this, need to properly parse query from the Info object.
-        """
-        additional_args = {}
-        for field_name in cls.get_fk_field_names():
-            if field_name in selected_fields and field_name not in ignore_fields:
-                query = query.options(joinedload(getattr(cls, field_name)))
-                additional_args[field_name] = True
-        return query, additional_args
 
     @classmethod
     def get_all(
@@ -82,77 +50,12 @@ class Base(DeclarativeBase):
         ignore_fields: Again a misnomer, FKs to not join on (has to do with auth).
         """
         query = db_session.query(cls)
-        query, FKs_to_convert = cls.apply_joins(query, selected_fields, ignore_fields)
 
         for attr_name, attr_value in filter_by_attrs.items():
             query = query.filter(getattr(cls, attr_name) == attr_value)
 
         result_objs = query.all()
-        if gql:
-            return [obj.to_gql(**FKs_to_convert) for obj in result_objs]
-        else:
-            return result_objs
-
-    @classmethod
-    def get_by_attr(
-        cls: Self,
-        db_session: Session,
-        selected_fields: str,
-        attr_name: str,
-        attr_value: any,
-        gql: bool = True,
-        ignore_fields: List[str] = [],
-        **kwargs,
-    ) -> List[Self]:
-        query = db_session.query(cls)
-        query, FKs_to_convert = cls.apply_joins(query, selected_fields, ignore_fields)
-        query = query.filter(getattr(cls, attr_name) == attr_value)
-        filtered_objs = query.all()
-
-        if gql:
-            return [obj.to_gql(**FKs_to_convert) for obj in filtered_objs]
-        else:
-            return filtered_objs
-
-    def convert_class_name_to_gql_type_name(self) -> str:
-        return f"{self.__class__.__name__}_gql"
-
-    def to_gql(self, **kwargs) -> Base_gql:
-        """
-        kwargs expects a dictionary in the format {
-            relationship_key_as_string: bool -> True if the object(s) corresponding
-            to this key should be loaded
-        }
-        """
-        gql_class_name = self.convert_class_name_to_gql_type_name()
-        gql_class = globals().get(gql_class_name)
-
-        if not gql_class:
-            raise GraphQLError(f"Strawberry type {gql_class_name} not found.")
-
-        gql_class_init_args = {
-            field: getattr(self, field)
-            for field in self.__table__.columns.keys()
-            if field != "password_hash"
-        }
-
-        # Handle nested objects.
-        for fk_field in self.get_fk_field_names():
-            if kwargs.get(fk_field, False):
-                nested_sql_obj = getattr(self, fk_field)
-                if isinstance(nested_sql_obj, list):
-                    gql_class_init_args[fk_field] = [
-                        obj.to_gql() for obj in nested_sql_obj
-                    ]
-                else:
-                    gql_class_init_args[fk_field] = (
-                        nested_sql_obj.to_gql() if nested_sql_obj else None
-                    )
-            else:
-                gql_class_init_args[fk_field] = None
-
-        gql_obj = gql_class(**gql_class_init_args)
-        return gql_obj
+        return result_objs
 
 
 class Employer(Base):
@@ -190,68 +93,6 @@ class Job(Base):
         back_populates="job",
         cascade="all, delete-orphan",
     )
-
-    def __repr__(self) -> str:
-        return (
-            f"Job(id={self.id!r}, title={self.title!r}, "
-            f"description={self.description[:30]!r}..., "
-            f"employer_id={self.employer_id!r})"
-        )
-
-    @classmethod
-    def get_all(
-        cls: Self,
-        db_session: Session,
-        selected_fields: str,
-        gql: bool = True,
-        ignore_fields: List[str] = [],
-        filter_by_attrs: Dict[str, any] = {},
-        **kwargs,
-    ) -> List[Self]:
-        user_id = filter_by_attrs.get("user_id", None)
-
-        if user_id is None or "applications" in ignore_fields:
-            return super().get_all(
-                db_session,
-                selected_fields,
-                gql=gql,
-                ignore_fields=ignore_fields,
-                filter_by_attrs=filter_by_attrs,
-                **kwargs,
-            )
-
-        # We're already filtering by user_id.
-        del filter_by_attrs["user_id"]
-
-        # If user_id is not None, we must retrieve only the current user's
-        # applications.
-        subquery = (
-            db_session.query(Application)
-            .filter(Application.user_id == user_id)
-            .subquery()
-        )
-
-        query = (
-            db_session.query(cls)
-            .outerjoin(subquery, cls.id == subquery.c.job_id)
-            .options(contains_eager(cls.applications, alias=subquery))
-        )
-
-        # Apply joinedloads.
-        query, FKs_to_convert = cls.apply_joins(
-            query, selected_fields, ["applications"], **kwargs
-        )
-
-        all_objs = query.all()
-        FKs_to_convert["applications"] = True
-
-        for attr_name, attr_value in filter_by_attrs.items():
-            query = query.filter(getattr(cls, attr_name) == attr_value)
-
-        if gql:
-            return [obj.to_gql(**FKs_to_convert) for obj in all_objs]
-        else:
-            return all_objs
 
 
 class User(Base):
