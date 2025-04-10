@@ -21,6 +21,6 @@ class EmployerFromJobsDataLoader(DataLoader):
 
         id_to_employer = dict()
         for employer in employers:
-            id_to_employer[employer.id] = employers
+            id_to_employer[employer.id] = employer
 
         return [id_to_employer[employer_id] for employer_id in employer_ids]

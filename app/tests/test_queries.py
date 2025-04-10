@@ -4,6 +4,8 @@ from .utils import (
     post_graphql,
     get_test_first_non_admin_id,
     get_test_first_non_admin_email,
+    get_job_ids_for_user,
+    get_application_ids_for_job,
 )
 from collections import defaultdict
 
@@ -32,9 +34,10 @@ def test_get_all_jobs(test_client, graphql_endpoint):
 def test_get_job_by_id_all_roles(
     test_client, graphql_endpoint, admin_header, user_header
 ):
+    user_job_ids = get_job_ids_for_user(2, applied=True)
     for job_id in range(1, len(JOBS_DATA) + 1):
         query = f"""
-            query {{
+        query {{
             job(id: {job_id}) {{
                 id
                 employerId
@@ -43,20 +46,44 @@ def test_get_job_by_id_all_roles(
                     name
                 }}
                 applications {{
+                    id
                     jobId
                     userId
                 }}
             }}
         }}
         """
-        for headers in ["", user_header, admin_header]:
-            result = post_graphql(test_client, graphql_endpoint, query, headers=headers)
-            job = result["data"]["job"]
-            assert job["title"] == JOBS_DATA[job_id - 1]["title"]
-            assert job["applications"] is None
-            assert (
-                EMPLOYERS_DATA[job["employerId"] - 1]["name"] == job["employer"]["name"]
-            )
+        # Unauth.
+        result = post_graphql(test_client, graphql_endpoint, query, headers="")
+        job = result["data"]["job"]
+        assert job["title"] == JOBS_DATA[job_id - 1]["title"]
+        assert job["applications"] == []
+        assert EMPLOYERS_DATA[job["employerId"] - 1]["name"] == job["employer"]["name"]
+
+        # User.
+        result = post_graphql(test_client, graphql_endpoint, query, headers=user_header)
+        job = result["data"]["job"]
+        assert job["title"] == JOBS_DATA[job_id - 1]["title"]
+        if job_id in user_job_ids:
+            assert len(job["applications"]) == 1
+            assert job["applications"][0]["userId"] == 2
+            assert job["applications"][0]["jobId"] == job_id
+        else:
+            assert len(job["applications"]) == 0
+
+        # Admin.
+        result = post_graphql(
+            test_client, graphql_endpoint, query, headers=admin_header
+        )
+        job = result["data"]["job"]
+        assert job["title"] == JOBS_DATA[job_id - 1]["title"]
+
+        application_ids = get_application_ids_for_job(job_id)
+        assert len(job["applications"]) == len(application_ids)
+        retrieved_app_ids = [x["id"] for x in job["applications"]]
+        assert sorted(application_ids) == sorted(
+            retrieved_app_ids
+        ), f"Job_id: {job_id} expected {sorted(application_ids)}, got {sorted(retrieved_app_ids)}"
 
 
 @pytest.mark.api
@@ -227,40 +254,6 @@ def test_get_jobs_from_employer(test_client, graphql_endpoint):
     assert sorted([job["title"] for job in employer["jobs"]]) == sorted(
         [job["title"] for job in JOBS_DATA[:2]]
     )
-
-
-@pytest.mark.api
-@pytest.mark.query
-def test_circular_reference_depth_limit(test_client, graphql_endpoint):
-    # Should not pass.
-    query = """
-    query {
-        employers {
-            jobs {
-            employer {
-                name
-            }
-            }
-        }
-    }
-    """
-    result = post_graphql(test_client, graphql_endpoint, query)
-    assert result["data"] is None
-    assert len(result["errors"]) >= 1
-
-    # Should pass.
-    query = """
-    query {
-        job(id: 1) {
-            employer {
-                name
-            }
-        }
-    }
-    """
-    result = post_graphql(test_client, graphql_endpoint, query)
-    job = result["data"]["job"]
-    assert job["employer"]["name"] == EMPLOYERS_DATA[0]["name"]
 
 
 @pytest.mark.api

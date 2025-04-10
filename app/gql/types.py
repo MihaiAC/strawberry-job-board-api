@@ -40,6 +40,8 @@ class Job_gql(Base_gql):
     async def employer(self, info: Info) -> Optional[Employer_gql]:
         loader = info.context["loaders"]["employer_from_jobs"]
         employer_sql = await loader.load(self.employer_id)
+        if employer_sql is None:
+            return None
         return employer_to_gql(employer_sql)
 
     @strawberry.field
@@ -51,13 +53,16 @@ class Job_gql(Base_gql):
 
         if user.role == Role.USER:
             loader = info.context["loaders"]["user_applications_from_job"]
-            applications_sql = await loader.load((self.id, user.id))
+            application_sql = await loader.load((self.id, user.id))
+            if application_sql is None:
+                return []
+            return [application_to_gql(application_sql)]
         elif user.role == Role.ADMIN:
             loader = info.context["loaders"]["all_applications_from_job"]
             applications_sql = await loader.load(self.id)
+            return [application_to_gql(app) for app in applications_sql]
         else:
             return []
-        return [application_to_gql(app) for app in applications_sql]
 
 
 @strawberry.type
@@ -95,11 +100,11 @@ class Application_gql(Base_gql):
         if user is None or (user.role != Role.ADMIN and user.id != self.user_id):
             return []
         loader = info.context["loaders"]["users_from_application"]
-        users_sql = await loader.load(self.user_id)
-        return [user_to_gql(user) for user in users_sql]
+        user_sql = await loader.load(self.user_id)
+        return user_to_gql(user_sql)
 
     @strawberry.field
     async def job(self, info: Info) -> Optional[Job_gql]:
         loader = info.context["loaders"]["jobs_from_application"]
-        jobs_sql = await loader.load(self.id)
-        return [job_to_gql(job) for job in jobs_sql]
+        job_sql = await loader.load(self.job_id)
+        return job_to_gql(job_sql)

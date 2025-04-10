@@ -91,6 +91,14 @@ def get_job_ids_for_user(user_id: int, applied: bool) -> List[int]:
     return [job_id for job_id in range(1, len(JOBS_DATA) + 1) if job_id not in job_ids]
 
 
+def get_application_ids_for_job(job_id: int) -> List[int]:
+    ids = []
+    for idx, application in enumerate(APPLICATIONS_DATA):
+        if application["job_id"] == job_id:
+            ids.append(idx + 1)
+    return ids
+
+
 def generate_test_jwt_admin_token() -> str:
     for user in USERS_DATA:
         if user["role"] == "admin":
@@ -180,8 +188,8 @@ class BaseQueries(str, Enum):
 
 if __name__ == "__main__":
     print(
-        f'Admin test admin header: {{"Authorization": "Bearer {generate_test_jwt_admin_token()}"}} '
+        f'Admin test header: {{"Authorization": "Bearer {generate_test_jwt_admin_token()}"}} '
     )
     print(
-        f'User test admin header: {{"Authorization": "Bearer {generate_test_jwt_user_token()}"}} '
+        f'User test header: {{"Authorization": "Bearer {generate_test_jwt_user_token()}"}} '
     )

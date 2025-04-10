@@ -6,7 +6,6 @@ from .db.models import (
 )
 
 
-# TODO: Boilerplate to avoid circular imports.
 def employer_to_gql(employer_sql: Employer_sql) -> "Employer_gql":
     from app.gql.types import Employer_gql
 
