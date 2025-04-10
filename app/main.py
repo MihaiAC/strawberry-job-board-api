@@ -22,8 +22,6 @@ from .gql.application.dataloaders import (
 from .gql.user.dataloaders import UsersFromApplicationDataLoader
 
 
-# TODO: Handing cache invalidation on mutations (can have mutation + query on same request + test).
-# TODO: Test nested queries.
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     prepare_database()

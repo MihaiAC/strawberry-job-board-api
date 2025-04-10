@@ -384,6 +384,7 @@ def test_get_all_applications_as_user(test_client, graphql_endpoint, user_header
 
 @pytest.mark.api
 @pytest.mark.query
+@pytest.mark.auth
 def test_get_all_applications_for_user(test_client, graphql_endpoint, user_header):
     query = """
     query {
@@ -419,6 +420,7 @@ def test_get_all_applications_for_user(test_client, graphql_endpoint, user_heade
 
 @pytest.mark.api
 @pytest.mark.query
+@pytest.mark.auth
 def test_get_all_applications_for_admin(test_client, graphql_endpoint, admin_header):
     query = """
     query {
