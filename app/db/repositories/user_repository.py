@@ -22,7 +22,9 @@ class UserRepository:
 
     @staticmethod
     def get_user_by_id(
-        db_session: Session, id: int, gql: bool = True
+        db_session: Session,
+        id: int,
+        gql: bool = True,
     ) -> Optional[User_sql]:
         users = User_sql.get_all(
             db_session=db_session,
@@ -34,3 +36,13 @@ class UserRepository:
         elif gql:
             return user_to_gql(users[0])
         return users[0]
+
+    @staticmethod
+    def get_users_by_ids(
+        db_session: Session,
+        user_ids: List[int],
+    ) -> List[User_sql]:
+        return User_sql.get_all(
+            db_session=db_session,
+            filter_by_attrs={"id": user_ids},
+        )
