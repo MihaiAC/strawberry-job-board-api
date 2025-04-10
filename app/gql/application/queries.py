@@ -14,13 +14,10 @@ class ApplicationQuery:
     def applications(self, info: Info) -> List[Application_gql]:
         user = info.context["user"]
         db_session = info.context["db_session"]
-        selected_fields = str(info.selected_fields)
 
         if user.role == Role.ADMIN:
-            return ApplicationRepository.get_all_applications(
-                db_session, selected_fields
-            )
+            return ApplicationRepository.get_all_applications(db_session, gql=True)
         else:
             return ApplicationRepository.get_all_applications_by_user_id(
-                db_session, selected_fields, user.id
+                db_session, user.id, gql=True
             )

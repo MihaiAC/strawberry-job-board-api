@@ -14,14 +14,11 @@ class UserQuery:
     @require_role([Role.ADMIN, Role.USER])
     def users(self, info: Info) -> List[User_gql]:
         db_session = info.context["db_session"]
-        selected_fields = str(info.selected_fields)
         user = info.context.get("user", None)
 
         if user.role == Role.ADMIN:
-            return UserRepository.get_all_users(db_session, selected_fields)
+            return UserRepository.get_all_users(db_session, gql=True)
         elif user.role == Role.USER:
-            user = UserRepository.get_user_by_id(
-                db_session, selected_fields, id=user.id
-            )
+            user = UserRepository.get_user_by_id(db_session, id=user.id)
             return [user] if user is not None else []
         return []

@@ -33,10 +33,7 @@ class Base(DeclarativeBase):
     def get_all(
         cls: Self,
         db_session: Session,
-        selected_fields: str,
-        gql: bool = True,
         filter_by_attrs: Dict[str, any] = {},
-        ignore_fields: List[str] = [],
         **kwargs,
     ) -> List[Self]:
         """

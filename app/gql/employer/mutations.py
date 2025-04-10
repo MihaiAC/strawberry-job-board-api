@@ -27,7 +27,7 @@ class EmployerMutation:
 
         # Enforce email uniqueness.
         existing_employer = EmployerRepository.get_employer_by_email(
-            db_session=db_session, selected_fields="", email=contact_email, gql=True
+            db_session=db_session, email=contact_email, gql=True
         )
         if existing_employer is not None:
             raise GraphQLError(EMPLOYER_ALREADY_EXISTS)
