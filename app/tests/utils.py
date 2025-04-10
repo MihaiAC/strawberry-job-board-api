@@ -99,6 +99,14 @@ def get_application_ids_for_job(job_id: int) -> List[int]:
     return ids
 
 
+def get_application_ids_for_user(user_id: int) -> List[int]:
+    ids = []
+    for idx, application in enumerate(APPLICATIONS_DATA):
+        if application["user_id"] == user_id:
+            ids.append(idx + 1)
+    return ids
+
+
 def generate_test_jwt_admin_token() -> str:
     for user in USERS_DATA:
         if user["role"] == "admin":
