@@ -6,6 +6,7 @@ from .utils import (
     get_test_first_non_admin_email,
     get_job_ids_for_user,
     get_application_ids_for_job,
+    get_application_ids_for_user,
 )
 from collections import defaultdict
 
@@ -301,7 +302,7 @@ def test_get_all_users_as_user(test_client, graphql_endpoint, user_header):
 
 @pytest.mark.api
 @pytest.mark.query
-def test_get_all_applications_admin(test_client, graphql_endpoint, admin_header):
+def test_get_all_applications_as_admin(test_client, graphql_endpoint, admin_header):
     query = """
     query {
         applications {
@@ -347,7 +348,7 @@ def test_get_all_applications_admin(test_client, graphql_endpoint, admin_header)
 
 @pytest.mark.api
 @pytest.mark.query
-def test_get_all_applications_user(test_client, graphql_endpoint, user_header):
+def test_get_all_applications_as_user(test_client, graphql_endpoint, user_header):
     query = """
     query {
         applications {
@@ -379,3 +380,78 @@ def test_get_all_applications_user(test_client, graphql_endpoint, user_header):
     assert len(applications) == application_count
     for application in applications:
         assert application["user"]["id"] == application["userId"] == auth_user_id
+
+
+@pytest.mark.api
+@pytest.mark.query
+def test_get_all_applications_for_user(test_client, graphql_endpoint, user_header):
+    query = """
+    query {
+        users {
+            id
+            username
+            email
+            applications {
+                id
+                userId
+                jobId
+            }
+        }
+    }
+    """
+    result = post_graphql(test_client, graphql_endpoint, query, headers=user_header)
+
+    users = result["data"]["users"]
+    assert len(users) == 1
+
+    user_id = get_test_first_non_admin_id()
+    user = users[0]
+    assert user["id"] == user_id
+
+    applications = user["applications"]
+    retrieved_app_ids = [app["id"] for app in applications]
+    expected_app_ids = get_application_ids_for_user(user_id)
+
+    assert sorted(retrieved_app_ids) == sorted(
+        expected_app_ids
+    ), f"{retrieved_app_ids} {expected_app_ids}"
+
+
+@pytest.mark.api
+@pytest.mark.query
+def test_get_all_applications_for_admin(test_client, graphql_endpoint, admin_header):
+    query = """
+    query {
+        users {
+            id
+            username
+            email
+            applications {
+                id
+                userId
+                jobId
+            }
+        }
+    }
+    """
+    result = post_graphql(test_client, graphql_endpoint, query, headers=admin_header)
+
+    users = result["data"]["users"]
+    assert len(users) == len(USERS_DATA)
+
+    for user_id in range(1, len(users) + 1):
+        found = False
+        for user in users:
+            if user["id"] == user_id:
+                found = True
+                break
+
+        assert found, f"User with id {user_id} not found."
+
+        applications = user["applications"]
+        retrieved_app_ids = [app["id"] for app in applications]
+        expected_app_ids = get_application_ids_for_user(user_id)
+
+        assert sorted(retrieved_app_ids) == sorted(
+            expected_app_ids
+        ), f"{retrieved_app_ids} {expected_app_ids}"
