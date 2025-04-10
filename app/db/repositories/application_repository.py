@@ -7,40 +7,50 @@ from graphql import GraphQLError
 from app.errors.error_messages import ALREADY_APPLIED
 from app.errors.custom_errors import ResourceNotFound
 from .job_repository import JobRepository
+from app.sql_to_gql import application_to_gql
 
 
 class ApplicationRepository:
     @staticmethod
     def get_all_applications(
-        db_session: Session, selected_fields: str, gql: bool = True
+        db_session: Session, gql: bool = False
     ) -> List[Application_gql | Application_sql]:
-        return Application_sql.get_all(db_session, selected_fields, gql)
+        applications = Application_sql.get_all(db_session)
+        if gql:
+            return [application_to_gql(app) for app in applications]
+        return applications
 
     @staticmethod
     def get_all_applications_by_user_id(
-        db_session: Session, selected_fields: str, user_id: int, gql: bool = True
+        db_session: Session, user_id: int, gql: bool = False
     ) -> List[Application_gql | Application_sql]:
-        return Application_sql.get_all(
+        applications = Application_sql.get_all(
             db_session=db_session,
-            selected_fields=selected_fields,
             filter_by_attrs={"user_id": user_id},
-            gql=gql,
         )
+
+        if gql:
+            return [application_to_gql(app) for app in applications]
+        return applications
 
     @staticmethod
     def get_all_applications_by_job_id(
-        db_session: Session, selected_fields: str, job_id: int, gql: bool = True
+        db_session: Session, job_id: int, gql: bool = False
     ) -> List[Application_gql | Application_sql]:
-        return Application_sql.get_all(
+        applications = Application_sql.get_all(
             db_session=db_session,
-            selected_fields=selected_fields,
             filter_by_attrs={"job_id": job_id},
             gql=gql,
         )
 
+        if gql:
+            return [application_to_gql(app) for app in applications]
+        return applications
+
     @staticmethod
     def get_applications_from_job_ids(
-        db_session: Session, job_ids: List[int]
+        db_session: Session,
+        job_ids: List[int],
     ) -> List[Application_sql]:
         applications = (
             db_session.query(Application_sql).filter(
@@ -80,8 +90,8 @@ class ApplicationRepository:
     def create_application(db_session: Session, user_id: int, job_id: int) -> bool:
         job = JobRepository.get_job_by_id(
             db_session=db_session,
-            selected_fields="",
             id=job_id,
+            gql=False,
         )
 
         if job is None:
@@ -89,9 +99,7 @@ class ApplicationRepository:
 
         user_applications = Application_sql.get_all(
             db_session=db_session,
-            selected_fields="",
             filter_by_attrs={"user_id": user_id, "job_id": job_id},
-            gql=False,
         )
 
         for application in user_applications:

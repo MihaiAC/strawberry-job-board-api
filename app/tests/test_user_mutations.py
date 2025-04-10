@@ -10,7 +10,7 @@ from app.db.repositories.user_repository import UserRepository
 
 
 def assert_no_new_user_added(db_session):
-    users = UserRepository.get_all_users(db_session, "", gql=False)
+    users = UserRepository.get_all_users(db_session, gql=False)
     assert len(users) == len(USERS_DATA)
 
 

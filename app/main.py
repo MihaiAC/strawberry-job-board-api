@@ -18,6 +18,13 @@ from .gql.application.dataloaders import (
 )
 
 
+# TODO: Fix repositories + get_all method in models.py.
+# TODO: Test nested queries. Going from jobs to users doesn't work yet.
+# TODO: Update jobs roles.
+# TODO: Make current tests pass.
+# TODO: If I access applications in a jobs query and token is expired,
+# applications are empty -> how to error?
+# TODO: How to invalidate cache when deleting a resource? Is it even needed here?
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     prepare_database()

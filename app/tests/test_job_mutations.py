@@ -186,7 +186,7 @@ def test_delete_existing_job(
 
     # Test cascade delete on applications.
     applications = ApplicationRepository.get_all_applications_by_job_id(
-        db_session=db_session, selected_fields="", job_id=job_id, gql=False
+        db_session=db_session, job_id=job_id, gql=False
     )
     for application in applications:
         assert application.job_id != job_id

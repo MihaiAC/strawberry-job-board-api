@@ -125,16 +125,14 @@ def test_delete_existing_employer(
     # Check that the employer has actually been deleted.
     employer = EmployerRepository.get_employer_by_id(
         db_session=db_session,
-        selected_fields="",
         id=employer_id,
         gql=False,
     )
     assert employer is None
 
     # Check that the jobs belonging to the employer have been deleted.
-    jobs = JobRepository.get_all_jobs_admin(
+    jobs = JobRepository.get_all_jobs(
         db_session=db_session,
-        selected_fields="",
         gql=False,
     )
     remaining_job_ids = []
@@ -145,7 +143,7 @@ def test_delete_existing_employer(
     # Check that the applications corresponding to the deleted jobs
     # have been deleted.
     remaining_applications = ApplicationRepository.get_all_applications(
-        db_session=db_session, selected_fields="", gql=False
+        db_session=db_session, gql=False
     )
     for application in remaining_applications:
         assert application.job_id in remaining_job_ids

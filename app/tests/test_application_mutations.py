@@ -9,7 +9,6 @@ from app.db.repositories.application_repository import ApplicationRepository
 def assert_no_new_application_added(db_session):
     applications = ApplicationRepository.get_all_applications(
         db_session=db_session,
-        selected_fields="",
         gql=False,
     )
     assert len(applications) == len(APPLICATIONS_DATA)
