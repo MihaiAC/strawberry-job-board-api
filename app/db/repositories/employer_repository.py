@@ -54,8 +54,7 @@ class EmployerRepository:
         db_session: Session,
         employer_ids: List[int],
     ) -> List[Employer_sql]:
-        employers = (
-            db_session.query(Employer_sql).filter(Employer_sql.id.in_(employer_ids))
-        ).all()
-
-        return employers
+        return Employer_sql.get_all(
+            db_session=db_session,
+            filter_by_attrs={"id": employer_ids},
+        )

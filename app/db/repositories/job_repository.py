@@ -93,9 +93,7 @@ class JobRepository:
     def get_jobs_by_employer_ids(
         db_session: Session, employer_ids: List[int]
     ) -> List[Job_sql]:
-        # TODO: Need to adapt SQL get_all to this - filter_by_attr check if list.
-        jobs = (
-            db_session.query(Job_sql).filter(Job_sql.employer_id.in_(employer_ids))
-        ).all()
-
-        return jobs
+        return Job_sql.get_all(
+            db_session=db_session,
+            filter_by_attrs={"employer_id": employer_ids},
+        )

@@ -1,5 +1,4 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import and_, or_
 from typing import List, Tuple
 from app.db.models import Application as Application_sql
 from app.gql.types import Application_gql
@@ -52,39 +51,30 @@ class ApplicationRepository:
         db_session: Session,
         job_ids: List[int],
     ) -> List[Application_sql]:
-        applications = (
-            db_session.query(Application_sql).filter(
-                Application_sql.job_id.in_(job_ids)
-            )
-        ).all()
-
-        return applications
+        return Application_sql.get_all(
+            db_session=db_session,
+            filter_by_attrs={"job_id": job_ids},
+        )
 
     @staticmethod
     def get_applications_from_user_ids(
-        db_session: Session, user_ids: List[int]
+        db_session: Session,
+        user_ids: List[int],
     ) -> List[Application_sql]:
-        applications = (
-            db_session.query(Application_sql).filter(
-                Application_sql.user_id.in_(user_ids)
-            )
-        ).all()
-
-        return applications
+        return Application_sql.get_all(
+            db_session=db_session,
+            filter_by_attrs={"user_id": user_ids},
+        )
 
     @staticmethod
     def get_all_applications_from_job_user_ids(
-        db_session: Session, job_user_id_tuples: List[Tuple[int, int]]
+        db_session: Session,
+        job_user_id_tuples: List[Tuple[int, int]],
     ) -> List[Application_sql]:
-        # Build compound filter.
-        filters = [
-            and_(Application_sql.job_id == job_id, Application_sql.user_id == user_id)
-            for job_id, user_id in job_user_id_tuples
-        ]
-
-        applications = db_session.query(Application_sql).filter(or_(*filters)).all()
-
-        return applications
+        return Application_sql.get_all(
+            db_session=db_session,
+            filter_by_attrs={("job_id", "user_id"): job_user_id_tuples},
+        )
 
     @staticmethod
     def create_application(db_session: Session, user_id: int, job_id: int) -> bool:
