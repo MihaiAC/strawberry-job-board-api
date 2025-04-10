@@ -91,9 +91,20 @@ class JobRepository:
 
     @staticmethod
     def get_jobs_by_employer_ids(
-        db_session: Session, employer_ids: List[int]
+        db_session: Session,
+        employer_ids: List[int],
     ) -> List[Job_sql]:
         return Job_sql.get_all(
             db_session=db_session,
             filter_by_attrs={"employer_id": employer_ids},
+        )
+
+    @staticmethod
+    def get_jobs_by_ids(
+        db_session: Session,
+        job_ids: List[int],
+    ) -> List[Job_sql]:
+        return Job_sql.get_all(
+            db_session=db_session,
+            filter_by_attrs={"id": job_ids},
         )

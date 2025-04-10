@@ -9,13 +9,17 @@ from .gql.root_query import Query
 from .db.database import prepare_database, get_session
 from .db.models import Employer as Employer_sql, Job as Job_sql
 from sqlalchemy.orm import Session
-from .gql.job.dataloaders import JobsFromEmployerDataLoader
+from .gql.job.dataloaders import (
+    JobsFromEmployerDataLoader,
+    JobsFromApplicationDataLoader,
+)
 from .gql.employer.dataloaders import EmployerFromJobsDataLoader
 from .gql.application.dataloaders import (
     AllApplicationsFromJobLoader,
     UserApplicationsFromJobLoader,
     AllApplicationsFromUserLoader,
 )
+from .gql.user.dataloaders import UsersFromApplicationDataLoader
 
 
 # TODO: Fix repositories + get_all method in models.py.
@@ -41,6 +45,8 @@ async def get_context(request: Request, db_session: Session = Depends(get_sessio
             "user_applications_from_job": UserApplicationsFromJobLoader(db_session),
             "all_applications_from_job": AllApplicationsFromJobLoader(db_session),
             "applications_from_user": AllApplicationsFromUserLoader(db_session),
+            "jobs_from_application": JobsFromApplicationDataLoader(db_session),
+            "users_from_application": UsersFromApplicationDataLoader(db_session),
         },
     }
 

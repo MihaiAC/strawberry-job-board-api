@@ -3,7 +3,12 @@ from strawberry.types import Info
 from typing import List, Optional
 from app.auth.auth_utils import require_role
 from app.auth.roles import Role
-from app.sql_to_gql import employer_to_gql, job_to_gql, application_to_gql
+from app.sql_to_gql import (
+    employer_to_gql,
+    job_to_gql,
+    application_to_gql,
+    user_to_gql,
+)
 
 
 class Base_gql:
@@ -68,9 +73,9 @@ class User_gql(Base_gql):
         # Only retrieve applications if request user matches this user
         # or the user is an admin.
         user = info.context["user"]
-
         if user is None or (user.role != Role.ADMIN and user.id != self.id):
             return []
+
         loader = info.context["loaders"]["applications_from_user"]
         applications_sql = await loader.load(self.id)
 
@@ -84,9 +89,17 @@ class Application_gql(Base_gql):
     job_id: int
 
     @strawberry.field
+    @require_role([Role.USER, Role.ADMIN])
     async def user(self, info: Info) -> Optional[User_gql]:
-        return None
+        user = info.context["user"]
+        if user is None or (user.role != Role.ADMIN and user.id != self.user_id):
+            return []
+        loader = info.context["loaders"]["users_from_application"]
+        users_sql = await loader.load(self.user_id)
+        return [user_to_gql(user) for user in users_sql]
 
     @strawberry.field
     async def job(self, info: Info) -> Optional[Job_gql]:
-        return None
+        loader = info.context["loaders"]["jobs_from_application"]
+        jobs_sql = await loader.load(self.id)
+        return [job_to_gql(job) for job in jobs_sql]
