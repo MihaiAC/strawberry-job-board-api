@@ -108,7 +108,7 @@ class Base(DeclarativeBase):
                 else:
                     # Format 4.
                     attr_names = first_attr_key
-                    attr_values = filter_by_attrs[attr_name]
+                    attr_values = filter_by_attrs[attr_names]
                     query = cls.apply_multi_attr_multivalued_filter(
                         query,
                         attr_names,

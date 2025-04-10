@@ -39,7 +39,6 @@ class ApplicationRepository:
         applications = Application_sql.get_all(
             db_session=db_session,
             filter_by_attrs={"job_id": job_id},
-            gql=gql,
         )
 
         if gql:
