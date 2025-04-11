@@ -457,3 +457,45 @@ def test_get_all_applications_for_admin(test_client, graphql_endpoint, admin_hea
         assert sorted(retrieved_app_ids) == sorted(
             expected_app_ids
         ), f"{retrieved_app_ids} {expected_app_ids}"
+
+
+@pytest.mark.api
+@pytest.mark.query
+def test_query_max_depth(test_client, graphql_endpoint, user_header):
+    query = """
+    query {
+        employers {
+            jobs {
+                employer {
+                    jobs {
+                        employer {
+                            id
+                        }
+                    }
+                }
+            }
+        }
+    }
+    """
+    result = post_graphql(test_client, graphql_endpoint, query, headers=user_header)
+    assert "errors" not in result
+
+    query = """
+    query {
+        employers {
+            jobs {
+                employer {
+                    jobs {
+                        employer {
+                            jobs {
+                                id
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    """
+    result = post_graphql(test_client, graphql_endpoint, query, headers=user_header)
+    assert "errors" in result
