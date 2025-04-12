@@ -17,4 +17,5 @@ dependencies:
   - conda-forge::deprecated
   - conda-forge::sqlacodegen
   - conda-forge::git-filter-repo
+  - coverage
 prefix: /home/mihaiac/miniconda3/envs/strawberry_fast_api
