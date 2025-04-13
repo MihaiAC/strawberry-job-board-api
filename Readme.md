@@ -1,4 +1,6 @@
-A simple job board API built with Strawberry, SQLAlchemy, FastAPI, and Postgres, exploring GraphQL best practices and efficient data loading.
+[![codecov](https://codecov.io/gh/MihaiAC/strawberry-job-board-api/branch/master/graph/badge.svg)](https://app.codecov.io/gh/MihaiAC/strawberry-job-board-api)
+
+A Dockerized GraphQL API modeling a simple job board, built with Strawberry, FastAPI, and SQLAlchemy.
 
 #### 1. Summary
 
