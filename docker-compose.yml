@@ -24,7 +24,9 @@ services:
       - "8000:8000"
     environment:
       - ENV_FILE=/app/.env
-    command: ["conda", "run", "-n", "strawberry_fast_api", "--no-capture-output", "fastapi", "run", "main.py", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    command: >
+      bash -c "until pg_isready -h postgres_dev -p 5432; do sleep 1; done &&
+               conda run -n strawberry_fast_api --no-capture-output fastapi run main.py --host 0.0.0.0 --port 8000 --reload"
     volumes:
       - ./app:/app
   pytest:
@@ -36,7 +38,10 @@ services:
       - postgres_test
     environment:
       - ENV_FILE=/app/.env.test
-    command: ["conda", "run", "-n", "strawberry_fast_api", "--no-capture-output", "tail", "-f", "/dev/null"]
+    command: >
+      bash -c "until pg_isready -h postgres_test -p 5432; do sleep 1; done &&
+               conda run -n strawberry_fast_api coverage run -m pytest &&
+               conda run -n strawberry_fast_api coverage xml -o /app/coverage.xml"
     volumes:
       - ./app:/app
 
