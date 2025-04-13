@@ -34,7 +34,7 @@ The value for `HOST` should be `postgres_dev` in .env and `postgres_test` in .en
 
 The values for `PORT` and `JWT_algorithm` should not be changed.
 
-**Build the containers.**
+**Build the dev container.**
 
 ```
 docker compose up -d
@@ -64,8 +64,10 @@ Include the token in the header of the requests, in this format:
 
 #### 3. Running the tests
 
+Build the test container, it will run the tests automatically and generate the coverage report in `/app/coverage.xml`:
+
 ```
-docker exec -it test_runner conda run -n strawberry_fast_api pytest
+docker compose -f docker-compose.test.yml -p test_env up --build --abort-on-container-exit
 ```
 
 #### 4. Project description

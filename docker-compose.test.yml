@@ -1,0 +1,23 @@
+services:
+    postgres_test:
+      image: postgres:17
+      container_name: postgres_test
+      env_file:
+      - ./app/.env.test
+      ports:
+        - "5433:5432"
+    pytest:
+      build:
+        context: .
+        dockerfile: Dockerfile
+      container_name: test_runner
+      depends_on:
+        - postgres_test
+      environment:
+        - ENV_FILE=/app/.env.test
+      command: >
+        bash -c "until pg_isready -h postgres_test -p 5432; do sleep 1; done &&
+                conda run -n strawberry_fast_api coverage run -m pytest &&
+                conda run -n strawberry_fast_api coverage xml -o /app/coverage.xml"
+      volumes:
+        - ./app:/app
