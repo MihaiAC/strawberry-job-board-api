@@ -1,4 +1,4 @@
-A lightweight job board backend built with Strawberry, SQLAlchemy, FastAPI, and Postgres, exploring GraphQL best practices and efficient data loading.
+A simple job board API built with Strawberry, SQLAlchemy, FastAPI, and Postgres, exploring GraphQL best practices and efficient data loading.
 
 #### 1. Summary
 
