@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Create environment.
 COPY environment.yml .
-RUN conda env create -f environment.yml
+RUN conda env create -fq environment.yml
 
 # Install Postgres client, needed in order to wait for DB to be ready.
 RUN apt-get update && apt-get install -y postgresql-client
