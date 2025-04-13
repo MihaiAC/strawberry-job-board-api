@@ -17,7 +17,7 @@ Main features:
 
 #### 2. Running the project
 
-Ensure that the app folder contains two .env files: .env and .env.test. These should include the following variables (with sample values given):
+Ensure that the /app/.env /app/.env.test files exist. They should include the following variables (sample values given):
 
 ```
 POSTGRES_USER=myuser
@@ -29,6 +29,8 @@ JWT_KEY="your_key_here"
 JWT_ALGORITHM="HS256"
 JWT_EXPIRATION_TIME_MINUTES=15
 ```
+
+The value for `HOST` should be `postgres_dev` in .env and `postgres_test` in .env.test
 
 The values for `PORT` and `JWT_algorithm` should not be changed.
 
