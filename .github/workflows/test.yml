@@ -1,0 +1,31 @@
+name: Test
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@a332ebc
+
+      - name: Create .env.test
+        run: |
+          cat <<EOF > app/.env.test
+          POSTGRES_USER=${{ secrets.TEST_DB_USER }}
+          POSTGRES_PASSWORD=${{ secrets.TEST_DB_PASS }}
+          POSTGRES_DB=testdb
+          HOST=postgres_test
+          PORT=5432
+          JWT_KEY=${{ secrets.JWT_KEY }}
+          JWT_ALGORITHM=HS256
+          JWT_EXPIRATION_TIME_MINUTES=15
+          EOF
+
+      - name: Build and run tests
+        run: docker compose -f docker-compose.test.yml -p test_env up --build --abort-on-container-exit
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@f95a404
